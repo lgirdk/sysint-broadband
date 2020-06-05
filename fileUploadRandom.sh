@@ -184,7 +184,7 @@ calcRandTimeandUpload()
 getBuildType()
 {
 
-   IMAGENAME=`sed -n 's/imagename[:|=]//p' /fss/gw/version.txt`
+   IMAGENAME=`sed -n 's/imagename[:|=]//p' /version.txt`
    TEMPDEV=`echo $IMAGENAME | grep DEV`
    if [ "$TEMPDEV" != "" ]
    then
