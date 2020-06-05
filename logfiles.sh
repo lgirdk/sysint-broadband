@@ -535,12 +535,8 @@ backupnvram2logs()
         fi
 
 	cd $destn
-        if [ -f "/version.txt" ]
-        then
-	    cp /version.txt $LOG_SYNC_PATH
-        else
-	   cp /fss/gw/version.txt $LOG_SYNC_PATH
-        fi
+	cp /version.txt $LOG_SYNC_PATH
+
         if [ "$BOX_TYPE" = "XB6" ]; then
         	cp $SYS_DB_FILE $LOG_SYNC_PATH$SYS_CFG_FILE
         	cp /nvram/$BBHM_CFG_FILE $LOG_SYNC_PATH$BBHM_CFG_FILE
@@ -605,12 +601,7 @@ backupnvram2logs_on_reboot()
 #	fi
 
 	cd $destn
-        if [ -f "/version.txt" ]
-        then
-	    cp /version.txt $LOG_SYNC_PATH
-        else
-	   cp /fss/gw/version.txt $LOG_SYNC_PATH
-        fi
+	cp /version.txt $LOG_SYNC_PATH
 
          if [ "$BOX_TYPE" = "XB6" ]; then
         	cp /nvram/$SYS_CFG_FILE $LOG_SYNC_PATH$SYS_CFG_FILE
@@ -718,6 +709,7 @@ backupAllLogs()
 		$operation $source$fname $dt; >$source$fname;
 	done
 	cp /version.txt $dt
+
 	if [ "$BOX_TYPE" = "XB6" ]; then
 		cp /nvram/$SYS_CFG_FILE $dt$SYS_CFG_FILE
         cp /nvram/$BBHM_CFG_FILE $dt$BBHM_CFG_FILE
