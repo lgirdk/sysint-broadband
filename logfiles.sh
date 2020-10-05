@@ -45,11 +45,6 @@ if [ -f /etc/ONBOARD_LOGGING_ENABLE ]; then
     ONBOARDLOGS_TMP_BACKUP_PATH="/tmp/onboardlogs/"
 fi
 
-if [ ! -f /usr/bin/GetConfigFile ];then
-    echo "Error: GetConfigFile Not Found"
-    exit 127
-fi
-
 PRESERVE_LOG_PATH="$LOG_SYNC_PATH/../preserveLogs/"
 
 IDLE_TIMEOUT=30
@@ -128,7 +123,7 @@ createSysDescr()
 
 flush_atom_logs()
 {
-    GetConfigFile $PEER_COMM_ID
+    # GetConfigFile $PEER_COMM_ID
     T2_ENABLE=`syscfg get T2Enable` 
     if [ ! -f $T2_0_BIN ]; then                                                 
     	echo_t  "Unable to find $T2_0_BIN ... Switching T2 Enable to false !!!"
@@ -171,7 +166,7 @@ sync_atom_log_files()
 {
     destination=$1
     SCP_PID=`pidof scp`
-    GetConfigFile $PEER_COMM_ID
+    # GetConfigFile $PEER_COMM_ID
 
     if [ "$SCP_PID" != "" ] && [ -f $SCP_RUNNING ] && [ ! -f $SCP_WAITING ]; then
         i=0;
