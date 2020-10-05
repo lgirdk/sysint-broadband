@@ -46,11 +46,6 @@ if [ -f /etc/ONBOARD_LOGGING_ENABLE ]; then
     ONBOARDLOGS_TMP_BACKUP_PATH="/tmp/onboardlogs/"
 fi
 
-if [ ! -f /usr/bin/GetConfigFile ];then
-    echo "Error: GetConfigFile Not Found"
-    exit 127
-fi
-
 PRESERVE_LOG_PATH="$LOG_SYNC_PATH/../preserveLogs/"
 
 IDLE_TIMEOUT=30
@@ -179,9 +174,6 @@ sync_atom_log_files()
 {
     destination=$1
     SCP_PID=`pidof scp`
-    if [ ! -f $PEER_COMM_ID ]; then
-        GetConfigFile $PEER_COMM_ID
-    fi
     if [ "$SCP_PID" != "" ] && [ -f $SCP_RUNNING ] && [ ! -f $SCP_WAITING ]; then
         i=0;
         timeout=1;
