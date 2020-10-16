@@ -22,7 +22,10 @@ source /etc/device.properties
 source /etc/logFiles.properties
 source /etc/log_timestamp.sh
 loop=1
+TFTP_PORT=69
 LOG_PATH=/rdklogs/logs/
+
+udpsvd -vE $ATOM_ARPING_IP $TFTP_PORT tftpd $LOG_PATH &
 
 #wait for components to create log
 sleep 10
