@@ -35,10 +35,11 @@ source /lib/rdk/t2Shared_api.sh
 #. $RDK_LOGGER_PATH/commonUtils.sh
 MAINTENANCE_WINDOW="/tmp/maint_upload"
 PATTERN_FILE="/tmp/pattern_file"
-SCP_RUNNING="/tmp/scp_running"
-SCP_WAITING="/tmp/scp_waiting"
 
 SCP_COMPLETE="/tmp/.scp_done"
+
+TFTP_IN_PROGRESS="/tmp/.tftp_inprogress"
+TFTP_PORT=69
 
 PEER_COMM_ID="/tmp/elxrretyt-logf.swr"
 if [ -f /etc/ONBOARD_LOGGING_ENABLE ]; then
@@ -144,6 +145,11 @@ flush_atom_logs()
     else
         ssh -I $IDLE_TIMEOUT -i $PEER_COMM_ID root@$ATOM_INTERFACE_IP "/bin/echo 'execTelemetry' > $TELEMETRY_INOTIFY_EVENT" > /dev/null 2>&1
     fi
+
+ 	# Interim fix to create the .dca_done file to avoid 60s wait in loop.
+ 	# Need to revisit this once telemetry or dca is enabled.
+ 	touch $DCA_COMPLETED
+
  	local loop=0
 	while :
 	do
@@ -170,68 +176,47 @@ flush_atom_logs()
     echo_t "[DEBUG] --OUT Function flush_atom_logs"
 }
 
-#To sync logs from atom side :
-#If there is no scp running then it should do the file transfer.
-# If some process try to execute when another scp operation is in progress,
-# it will wait for 60 sec, then it will forcefully kill the scp process if it still exists.
 sync_atom_log_files()
 {
-    destination=$1
-    SCP_PID=`pidof scp`
+	local destination=$1
+	local ATOM_LOG_FILES=$(echo $ATOM_FILE_LIST | tr ",{}" " ")
+	local waited=0
 
-#   if [ ! -f $PEER_COMM_ID ]; then
-#       GetConfigFile $PEER_COMM_ID
-#   fi
+	# There's a race condition between testing for and creating the
+	# "in progress" file, so a better solution will be needed if
+	# there's any serious contention.
 
-    if [ "$SCP_PID" != "" ] && [ -f $SCP_RUNNING ] && [ ! -f $SCP_WAITING ]; then
-        i=0;
-        timeout=1;
-        echo_t "Already scp running pid=$SCP_PID"
-        touch $SCP_WAITING
-        while [ $i -le 60 ]; do
-            SCP_PID=`pidof scp`
-            if [ "$SCP_PID" == "" ]; then
-                timeout=0
-                echo_t "existing scp process finished"
-                break
-            fi
-            i=$((i + 1))
-            sleep 1
+	while true
+	do
+		if [ ! -f $TFTP_IN_PROGRESS ]
+		then
+			touch $TFTP_IN_PROGRESS
+			break
+
+		elif [ $waited -ge 60 ]
+		then
+			echo_t "Sync Atom logs failed, earlier tftp transfer still in progress"
+			return 1
+		fi
+
+		sleep 1
+
+		waited=$((waited+1))
+	done
+
+	for fname in $ATOM_LOG_FILES
+	do
+		if [ "${fname: -1}" = "*" ]
+		then
+			tftp -r ${fname%%\**}0 -g $ATOM_ARPING_IP $TFTP_PORT -l $destination${fname%%\**}0
+			tftp -r ${fname%%\**}1 -g $ATOM_ARPING_IP $TFTP_PORT -l $destination${fname%%\**}1
+		else
+			tftp -r $fname -g $ATOM_ARPING_IP $TFTP_PORT -l $destination$fname
+		fi
         done
 
-        if [ $timeout -eq 1 ]; then
-            echo_t "killing all scp"
-            killall scp
-        fi
-
-        if [ -f $SCP_RUNNING ]; then
-            rm $SCP_RUNNING
-        fi
-            scp -i $PEER_COMM_ID -r root@$ATOM_IP:$ATOM_LOG_PATH$ATOM_FILE_LIST $destination > /dev/null 2>&1
-        sync_res=$?
-        if [ "$sync_res" = "0" ]; then
-            echo "Sync from ATOM complete"
-        else
-            echo "Sync from ATOM failed , return code is $sync_res"
-        fi
-
-        if [ -f $SCP_WAITING ]; then
-            rm $SCP_WAITING
-        fi
-    elif [ "$SCP_PID" == "" ]; then
-        touch $SCP_RUNNING
-            scp -i $PEER_COMM_ID -r root@$ATOM_IP:$ATOM_LOG_PATH$ATOM_FILE_LIST $destination > /dev/null 2>&1
-        sync_res=$?
-        if [ "$sync_res" = "0" ]; then
-            echo "Sync from ATOM complete"
-        else
-            echo "Sync from ATOM failed , return code is $sync_res"
-        fi
-        rm $SCP_RUNNING
-    fi
+	rm -f $TFTP_IN_PROGRESS
 }
-
-
 
 
 
@@ -891,9 +876,9 @@ allFileExists()
 
 syncLogs()
 {
-    if [ ! -d $NVRAM_LOG_PATH ]; then
+    if [ ! -d $TMP_LOG_PATH ]; then
 	#echo "making directory"
-	mkdir -p $NVRAM_LOG_PATH  # used by no nvram2 device
+	mkdir -p $TMP_LOG_PATH  # used by no nvram2 device
     fi
     #result=`allFileExists $LOG_PATH`
     #if [ "$result" = "no" ]
@@ -904,20 +889,23 @@ syncLogs()
 
     for file in $file_list
     do
-	cp $LOG_PATH$file $NVRAM_LOG_PATH # Copying all log files directly
+	cp $LOG_PATH$file $TMP_LOG_PATH # Copying all log files directly
     done
-    for fname in $LOG_FILES_NAMES
-    do
-	if [ -f $LOG_PATH$fname ]
-   	then
+
+    if [ -d "$LOG_BACK_UP_REBOOT" ]; then
+        for fname in $LOG_FILES_NAMES
+        do
+	    if [ -f $LOG_PATH$fname ]
+   	    then
    		cat $LOG_PATH$fname >> $LOG_BACK_UP_REBOOT$fname
-   	fi
+   	    fi
 
     #    if [ -f $LOG_BACK_UP_REBOOT$fname ]
 	#then
 	#	$LOG_BACK_UP_REBOOT$fname > $LOG_PATH$fname
 	#fi
-   done
+        done
+    fi
     #fi
 	
 	#for fname in $LOG_FILES_NAMES
