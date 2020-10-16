@@ -367,7 +367,7 @@ else
 fi
 #sleep 3
 
-if [ "$4" = "upload" ]
+if [ "$4" = "upload" ] && [ "$(processDCMResponse)" != "false" ]
 then
 	/rdklogger/uploadRDKBLogs.sh "" HTTP "" false
 fi

@@ -32,6 +32,9 @@ else
 	MAXSIZE=1536
 fi
 
+TFTP_PORT=69
+udpsvd -vE $ATOM_ARPING_IP $TFTP_PORT tftpd $LOG_PATH &
+
 #wait for components to create log
 sleep 10
 
