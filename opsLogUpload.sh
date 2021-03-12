@@ -120,12 +120,7 @@ PATTERN_FILE="/tmp/pattern_file"
 WAN_INTERFACE=$(getWanInterfaceName)
 SECONDV=`dmcli eRT getv Device.X_CISCO_COM_CableModem.TimeOffset | grep value | cut -d ":" -f 3 | tr -d ' ' `
 UPLOAD_LOG_STATUS="/tmp/upload_log_status"
-if [ "$BOX_TYPE" = "XB3" ]; then
 SYS_DB_FILE="/nvram/syscfg.db"
-else
-SYS_DB_FILE="/opt/secure/data/syscfg.db"
-fi
-
 
 if [ "$UploadHttpLink" == "" ]
 then
