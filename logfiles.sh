@@ -66,12 +66,7 @@ FLUSH_LOG_PATH="/rdklogger/flush_logs.sh"
 SYS_CFG_FILE="syscfg.db"
 BBHM_CFG_FILE="bbhm_cur_cfg.xml"
 WIRELESS_CFG_FILE="wireless"
-
-if [ "$BOX_TYPE" = "XB3" ]; then
 SYS_DB_FILE="/nvram/syscfg.db"
-else
-SYS_DB_FILE="/opt/secure/data/syscfg.db"
-fi
 
 moveFile()
 {        
