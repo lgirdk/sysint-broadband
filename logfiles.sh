@@ -69,11 +69,7 @@ WIRELESS_CFG_FILE="wireless"
 SE05x_rdk_logs="se05x_daemon.log"
 SE05x_tmp_logs="/tmp/rdkssa.txt"
 
-if [ "$BOX_TYPE" = "XB3" ]; then
 SYS_DB_FILE="/nvram/syscfg.db"
-else
-SYS_DB_FILE="/opt/secure/data/syscfg.db"
-fi
 
 moveFile()
 {        
