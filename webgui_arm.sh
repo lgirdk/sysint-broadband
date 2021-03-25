@@ -131,7 +131,7 @@ proxy.server      =    ( \"\" =>
 }" >> $LIGHTTPD_CONF
 
 # No RF captive portal 
-if [ "$BOX_TYPE" = "XB6" ]
+if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "MV2PLUS" ]
 then
    echo "\$SERVER[\"socket\"] == \"brlan0:31515\" { server.use-ipv6 = \"enable\" 
 proxy.server      =    ( \"\" =>
@@ -208,7 +208,7 @@ echo_t "WEBGUI : NotifyWiFiChanges is $SET_CONFIGURE_FLAG"
 echo_t "WEBGUI : redirection_flag val is $WIFIUNCONFIGURED"
 
 # No RF captive portal
-if [ "$BOX_TYPE" = "XB6" ]
+if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "MV2PLUS" ]
 then
 
 	if [ -f "/tmp/.gotnetworkresponse" ]

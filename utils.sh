@@ -75,7 +75,7 @@ getIPAddress()
 
 getCMIPAddress()
 {
-    if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "TCCBR" ]; then
+    if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "TCCBR" ] || [ "$BOX_TYPE" = "MV2PLUS" ]; then
        address=`dmcli eRT getv Device.X_CISCO_COM_CableModem.IPv6Address | grep string | awk '{print $5}'`
        if [ ! "$address" ]; then
           address=`dmcli eRT getv Device.X_CISCO_COM_CableModem.IPAddress | grep string | awk '{print $5}'`
@@ -95,7 +95,7 @@ getCMIPAddress()
 
 getErouterIPAddress()
 {
-    if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "TCCBR" ]; then
+    if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "TCCBR" ] || [ "$BOX_TYPE" = "MV2PLUS" ]; then
         address=`dmcli eRT getv Device.DeviceInfo.X_COMCAST-COM_WAN_IPv6 | grep string | awk '{print $5}'`
         if [ ! "$address" ]; then
             address=`dmcli eRT getv Device.DeviceInfo.X_COMCAST-COM_WAN_IP | grep string | awk '{print $5}'`
@@ -126,7 +126,7 @@ getMacAddress()
 {
     if [ $BOX_TYPE = "XF3" ]; then                           
         mac=`dmcli eRT getv Device.DPoE.Mac_address | grep value | awk '{print $5}'`
-    elif [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "TCCBR" ];then
+    elif [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "TCCBR" ] || [ "$BOX_TYPE" = "MV2PLUS" ];then
         mac=`dmcli eRT getv Device.X_CISCO_COM_CableModem.MACAddress | grep value | awk '{print $5}'`
     elif [ "$BOX_TYPE" = "HUB4" ]; then
         mac=`ifconfig $WANINTERFACE | grep HWaddr | cut -d " " -f11`
