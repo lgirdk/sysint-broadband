@@ -570,7 +570,7 @@ uploadOnRequest()
 		fi
 	fi
 
-	if [ "$BOX_TYPE" = "XB6" ]; then
+	if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "MV2PLUS" ]; then
 		cp $SYS_DB_FILE $dest$SYS_CFG_FILE
                 cp /tmp/$BBHM_CFG_FILE $dest$BBHM_CFG_FILE
         sed -i "s/.*passphrase.*/\toption passphrase \'\'/g" $dest$WIRELESS_CFG_FILE
