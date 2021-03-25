@@ -97,7 +97,7 @@ getIPAddress()
 
 getCMIPAddress()
 {
-    if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "TCCBR" ]; then
+    if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "TCCBR" ] || [ "$BOX_TYPE" = "MV2PLUS" ]; then
        address=`dmcli eRT retv Device.X_CISCO_COM_CableModem.IPv6Address`
        if [ ! "$address" ]; then
           address=`dmcli eRT retv Device.X_CISCO_COM_CableModem.IPAddress`
@@ -124,7 +124,7 @@ getCMIPAddress()
 
 getErouterIPAddress()
 {
-    if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "TCCBR" ]; then
+    if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "TCCBR" ] || [ "$BOX_TYPE" = "MV2PLUS" ]; then
         address=`dmcli eRT retv Device.DeviceInfo.X_COMCAST-COM_WAN_IPv6`
         if [ ! "$address" ]; then
             address=`dmcli eRT retv Device.DeviceInfo.X_COMCAST-COM_WAN_IP`
@@ -162,7 +162,7 @@ getMacAddress()
 {
     if [ $BOX_TYPE = "XF3" ]; then                           
         mac=`dmcli eRT retv Device.DPoE.Mac_address`
-    elif [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "TCCBR" ];then
+    elif [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "TCCBR" ] || [ "$BOX_TYPE" = "MV2PLUS" ];then
         mac=`dmcli eRT retv Device.X_CISCO_COM_CableModem.MACAddress`
     elif [ "$BOX_TYPE" = "VNTXER5" ];then
 	# XER5 base mac or ethwan mac can be retrived via below tr-181.
