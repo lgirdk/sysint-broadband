@@ -259,7 +259,7 @@ syncLogs_nvram2()
 
         fi
 
-	if [ "$BOX_TYPE" == "XB6" ] || [ "$BOX_TYPE" == "XF3" ] || [ "$BOX_TYPE" == "TCCBR" ];then
+	if [ "$BOX_TYPE" == "XB6" ] || [ "$BOX_TYPE" == "XF3" ] || [ "$BOX_TYPE" == "TCCBR" ] || [ "$BOX_TYPE" = "MV2PLUS" ];then
 		current_time=$(date +%s)
 		   if [ -f "$lastdmesgsync" ];then
 		   	lastsync_time=`cat $lastdmesgsync`
@@ -344,7 +344,7 @@ CopyToTmp()
 		rm -rf $LOG_SYNC_BACK_UP_PATH*tar.gz*
 	fi
 	rm -rf $LOG_SYNC_BACK_UP_PATH$PcdLogFile
-	if [ "$BOX_TYPE" = "XB6" ]; then
+	if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "MV2PLUS" ]; then
 		rm -rf $LOG_SYNC_BACK_UP_PATH$SYS_CFG_FILE  
 		rm -rf $LOG_SYNC_BACK_UP_PATH$BBHM_CFG_FILE
 		rm -rf $LOG_SYNC_BACK_UP_PATH$WIRELESS_CFG_FILE
@@ -572,7 +572,7 @@ backupnvram2logs()
               cp $SE05x_tmp_logs $LOG_SYNC_PATH$SE05x_rdk_logs
         fi
 
-        if [ "$BOX_TYPE" = "XB6" ]; then
+        if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "MV2PLUS" ]; then
         	cp $SYS_DB_FILE $LOG_SYNC_PATH$SYS_CFG_FILE
         	cp /tmp/$BBHM_CFG_FILE $LOG_SYNC_PATH$BBHM_CFG_FILE
         	cp /nvram/config/$WIRELESS_CFG_FILE $LOG_SYNC_PATH$WIRELESS_CFG_FILE
@@ -603,7 +603,7 @@ backupnvram2logs()
 		rm -rf $LOG_SYNC_PATH*tar.gz*
 	fi
 	rm -rf $LOG_SYNC_PATH$PcdLogFile
-	if [ "$BOX_TYPE" = "XB6" ]; then
+	if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "MV2PLUS" ]; then
 		rm -rf $LOG_SYNC_PATH$SYS_CFG_FILE  
 		rm -rf $LOG_SYNC_PATH$BBHM_CFG_FILE
 		rm -rf $LOG_SYNC_PATH$WIRELESS_CFG_FILE
@@ -678,7 +678,7 @@ backupnvram2logs_on_reboot()
               cp $SE05x_tmp_logs $TarFolder$SE05x_rdk_logs
         fi
 
-         if [ "$BOX_TYPE" = "XB6" ]; then
+         if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "MV2PLUS" ]; then
         	cp $SYS_DB_FILE $TarFolder$SYS_CFG_FILE
         	cp /nvram/$BBHM_CFG_FILE $TarFolder$BBHM_CFG_FILE
         	cp /nvram/config/$WIRELESS_CFG_FILE $TarFolder$WIRELESS_CFG_FILE
@@ -707,7 +707,7 @@ backupnvram2logs_on_reboot()
 
 	rm -rf $TarFolder$PcdLogFile
 	rm -rf $TarFolder$RAM_OOPS_FILE
-	if [ "$BOX_TYPE" = "XB6" ]; then
+	if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "MV2PLUS" ]; then
 		rm -rf $TarFolder$SYS_CFG_FILE
 		rm -rf $TarFolder$BBHM_CFG_FILE
 		rm -rf $TarFolder$WIRELESS_CFG_FILE
@@ -811,7 +811,8 @@ backupAllLogs()
         if [ "$MODEL_NUM" = "CGM4981COM" ]; then
               cp $SE05x_tmp_logs $dt$SE05x_rdk_logs
         fi
-	if [ "$BOX_TYPE" = "XB6" ]; then
+
+	if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "MV2PLUS" ]; then
 		cp $SYS_DB_FILE $dt$SYS_CFG_FILE
         cp /nvram/$BBHM_CFG_FILE $dt$BBHM_CFG_FILE
         cp /nvram/config/$WIRELESS_CFG_FILE $dt$WIRELESS_CFG_FILE
