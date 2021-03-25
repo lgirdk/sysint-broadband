@@ -253,7 +253,7 @@ syncLogs_nvram2()
 
         fi
 
-	if [ "$BOX_TYPE" == "XB6" ] || [ "$BOX_TYPE" == "XF3" ] || [ "$BOX_TYPE" == "TCCBR" ];then
+	if [ "$BOX_TYPE" == "XB6" ] || [ "$BOX_TYPE" == "XF3" ] || [ "$BOX_TYPE" == "TCCBR" ] || [ "$BOX_TYPE" = "MV2PLUS" ];then
 		current_time=$(date +%s)
 		   if [ -f "$lastdmesgsync" ];then
 		   	lastsync_time=`cat $lastdmesgsync`
@@ -525,7 +525,7 @@ backupnvram2logs()
 	cd $destn
 	cp /version.txt $LOG_SYNC_PATH
 
-        if [ "$BOX_TYPE" = "XB6" ]; then
+        if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "MV2PLUS" ]; then
         	cp $SYS_DB_FILE $LOG_SYNC_PATH$SYS_CFG_FILE
         	cp /nvram/$BBHM_CFG_FILE $LOG_SYNC_PATH$BBHM_CFG_FILE
         	cp /nvram/config/$WIRELESS_CFG_FILE $LOG_SYNC_PATH$WIRELESS_CFG_FILE
@@ -553,7 +553,7 @@ backupnvram2logs()
 	rm -rf $LOG_SYNC_PATH*.log*
 	rm -rf $LOG_SYNC_PATH*core*
 	rm -rf $LOG_SYNC_PATH$PcdLogFile
-	if [ "$BOX_TYPE" = "XB6" ]; then
+	if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "MV2PLUS" ]; then
 		rm -rf $LOG_SYNC_PATH$SYS_CFG_FILE  
 		rm -rf $LOG_SYNC_PATH$BBHM_CFG_FILE
 		rm -rf $LOG_SYNC_PATH$WIRELESS_CFG_FILE
@@ -591,7 +591,7 @@ backupnvram2logs_on_reboot()
 	cd $destn
 	cp /version.txt $LOG_SYNC_PATH
 
-         if [ "$BOX_TYPE" = "XB6" ]; then
+         if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "MV2PLUS" ]; then
         	cp $SYS_DB_FILE $LOG_SYNC_PATH$SYS_CFG_FILE
         	cp /nvram/$BBHM_CFG_FILE $LOG_SYNC_PATH$BBHM_CFG_FILE
         	cp /nvram/config/$WIRELESS_CFG_FILE $LOG_SYNC_PATH$WIRELESS_CFG_FILE
@@ -616,7 +616,7 @@ backupnvram2logs_on_reboot()
 	rm -rf $LOG_SYNC_PATH*core*
 	rm -rf $LOG_SYNC_PATH$PcdLogFile
 	rm -rf $LOG_SYNC_PATH$RAM_OOPS_FILE
-	if [ "$BOX_TYPE" = "XB6" ]; then
+	if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "MV2PLUS" ]; then
 		rm -rf $LOG_SYNC_PATH$SYS_CFG_FILE
 		rm -rf $LOG_SYNC_PATH$BBHM_CFG_FILE
 		rm -rf $LOG_SYNC_PATH$WIRELESS_CFG_FILE
@@ -698,7 +698,7 @@ backupAllLogs()
 	done
 	cp /version.txt $dt
 
-	if [ "$BOX_TYPE" = "XB6" ]; then
+	if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "MV2PLUS" ]; then
 		cp $SYS_DB_FILE $dt$SYS_CFG_FILE
         cp /nvram/$BBHM_CFG_FILE $dt$BBHM_CFG_FILE
         cp /nvram/config/$WIRELESS_CFG_FILE $dt$WIRELESS_CFG_FILE
