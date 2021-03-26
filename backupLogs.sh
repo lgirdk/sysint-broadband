@@ -101,8 +101,8 @@ Trigger_RebootPendingNotify()
 
 getBuildType()
 {
+   IMAGENAME=$(sed -n 's/^imagename[:=]"\?\([^"]*\)"\?/\1/p' /version.txt)
 
-   IMAGENAME=`sed -n 's/imagename[:|=]//p' /version.txt`
    TEMPDEV=`echo $IMAGENAME | grep DEV`
    if [ "$TEMPDEV" != "" ]
    then
