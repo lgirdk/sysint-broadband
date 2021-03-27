@@ -166,7 +166,7 @@ rebootFunc()
 # Return system uptime in seconds
 Uptime()
 {
-     cat /proc/uptime | awk '{ split($1,a,".");  print a[1]; }'
+    sed -n 's/\..*//p' /proc/uptime
 }
 
 ## Get Model No of the box
