@@ -157,7 +157,7 @@ flush_atom_logs()
 		     echo_t "[DEBUG] telemetry operation completed loop count = $loop" >> /rdklogs/logs/telemetry2_0.txt.0
 		     echo_t "[DEBUG] telemetry operation completed loop count = $loop"
                      echo_t "DCA completed or wait for 60 sec is over, flushing ATOM logs"
-                        atom_log_flush=`rpcclient  $ATOM_ARPING_IP "$FLUSH_LOG_PATH"`
+                        atom_log_flush=`rpcclient2 "$FLUSH_LOG_PATH"`
 			atom_log_flush_output=`echo "$atom_log_flush" | grep "RPC CONNECTED"`
 			if [ "$atom_log_flush_output" = "" ];then
                      	echo_t "rpcclient failed, setting FlushAllLogs TR-181 to flush atom side logs"
@@ -1054,13 +1054,13 @@ backup_onboarding_logs()
             cat $LOG_PATH$file >> $ONBOARDLOGS_NVRAM_BACKUP_PATH$file
             >$LOG_PATH$file
             if [ "$BOX_TYPE" == "XB3" ];then
-                rpcclient  $ATOM_ARPING_IP ">$LOG_PATH$file"
+                rpcclient2 ">$LOG_PATH$file"
             fi
         else
             cp $LOG_PATH$file $ONBOARDLOGS_NVRAM_BACKUP_PATH
             >$LOG_PATH$file
             if [ "$BOX_TYPE" == "XB3" ];then
-                rpcclient  $ATOM_ARPING_IP ">$LOG_PATH$file"
+                rpcclient2 ">$LOG_PATH$file"
             fi
         fi
     done
