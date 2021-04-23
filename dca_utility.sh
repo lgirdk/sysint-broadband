@@ -284,7 +284,7 @@ getEstbMac()
        echo "$estbMac"
     else
        if [ "$BOX_TYPE" == "XB3" ]; then
-          estbMac=`/usr/bin/rpcclient $ARM_ARPING_IP "ifconfig $EROUTER_IF" | grep 'Link encap:' | cut -d ' ' -f7`
+          estbMac=`/usr/bin/rpcclient2 "ifconfig $EROUTER_IF" | grep 'Link encap:' | cut -d ' ' -f7`
           echo "$estbMac"
        else
           estbMac=`ifconfig $EROUTER_IF | grep 'Link encap:' | cut -d ' ' -f7`
@@ -608,12 +608,12 @@ if [ "x$DCA_MULTI_CORE_SUPPORTED" = "xyes" ]; then
     fi
     scp -i $PEER_COMM_ID -r $ARM_INTERFACE_IP:$LOG_PATH/* $TMP_SCP_PATH/ > /dev/null 2>&1
  
-    RPC_RES=`rpcclient $ARM_ARPING_IP "touch $SCP_COMPLETE"`
+    RPC_RES=`rpcclient2 "touch $SCP_COMPLETE"`
     RPC_OK=`echo $RPC_RES | grep "RPC CONNECTED"`
     if [ "$RPC_OK" == "" ]; then
 	 echo_t "RPC touch failed : attemp 1"
 
-	 RPC_RES=`rpcclient $ARM_ARPING_IP "touch $SCP_COMPLETE"`
+	 RPC_RES=`rpcclient2 "touch $SCP_COMPLETE"`
      RPC_OK=`echo $RPC_RES | grep "RPC CONNECTED"`
 	 if [ "$RPC_OK" == "" ]; then
 		echo_t "RPC touch failed : attemp 2"
