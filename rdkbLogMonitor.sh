@@ -653,6 +653,12 @@ else
 fi
 ########################################################
 
+# Wait until 900 sec after boot (default wait time before starting resource monitor) before starting logMonitor thread.
+UPTIME=$(cut -d. -f1 /proc/uptime)
+if [ "$UPTIME" -lt 900 ]; then
+	sleep $((900-UPTIME))
+fi
+
 PEER_COMM_ID="/tmp/elxrretyt-logm.swr"
 
 RebootReason=`syscfg get X_RDKCENTRAL-COM_LastRebootReason`
