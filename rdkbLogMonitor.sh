@@ -234,7 +234,8 @@ SERVER=`getTFTPServer $BUILD_TYPE`
 get_logbackup_cfg()
 {
 default_logbackup_enable="true"
-backupenable=`syscfg get logbackup_enable`
+eval $(utctx_cmd get logbackup_enable logbackup_interval)
+backupenable=$SYSCFG_logbackup_enable
 backupenable_err=`echo $backupenable | grep "error" -i`
 if [ "$backupenable_err" != "" ]
 then
@@ -254,7 +255,7 @@ then
 else
 	LOGBACKUP_ENABLE="false"
 fi
-	LOGBACKUP_INTERVAL=`syscfg get logbackup_interval`
+	LOGBACKUP_INTERVAL=$SYSCFG_logbackup_interval
 
 }
 
@@ -588,6 +589,12 @@ else
     exit
 fi
 ########################################################
+
+# Wait until 900 sec after boot (default wait time before starting resource monitor) before starting logMonitor thread.
+UPTIME=$(cut -d. -f1 /proc/uptime)
+if [ "$UPTIME" -lt 900 ]; then
+    sleep $((900-UPTIME))
+fi
 
 PEER_COMM_ID="/tmp/elxrretyt-logm.swr"
 
