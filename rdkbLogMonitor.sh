@@ -437,7 +437,7 @@ bootup_upload()
 		   break
 	      fi
 
-		bootup_time_sec=`cat /proc/uptime | cut -d'.' -f1`
+		bootup_time_sec=$(cut -d. -f1 /proc/uptime)
 		if [ "$bootup_time_sec" -ge "600" ] ; then
 			echo_t "Boot time is more than 10 min, Breaking Loop"
 			break
@@ -530,7 +530,7 @@ bootup_upload()
 				break
 			     fi
 
-                             bootup_time_sec=`cat /proc/uptime | cut -d'.' -f1`
+                             bootup_time_sec=$(cut -d. -f1 /proc/uptime)
                              if [ "$bootup_time_sec" -ge "600" ] ; then
                                   echo_t "Boot time is more than 10 min, Breaking Loop"
                                   break
@@ -867,7 +867,7 @@ do
 	get_logbackup_cfg
 	if [ "$LOGBACKUP_ENABLE" == "true" ]; then # nvram2 supported and backup is true
 		minute_count=$((minute_count + 1))
-		bootup_time_sec=`cat /proc/uptime | cut -d'.' -f1`
+		bootup_time_sec=$(cut -d. -f1 /proc/uptime)
 		if [ "$bootup_time_sec" -le "2400" ] && [ $minute_count -eq 10 ]; then
 			minute_count=0
 			echo_t "RDK_LOGGER: Syncing every 10 minutes for initial 30 minutes"
