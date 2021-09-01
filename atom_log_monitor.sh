@@ -24,6 +24,7 @@ source /etc/log_timestamp.sh
 loop=1
 TFTP_PORT=69
 LOG_PATH=/rdklogs/logs/
+MAXSIZE_ATOM=1536
 
 udpsvd -vE $ATOM_ARPING_IP $TFTP_PORT tftpd $LOG_PATH &
 
@@ -67,8 +68,8 @@ do
 		done
 	fi
 
-	if [ $totalSize -ge $MAXSIZE ]; then
-		echo_t "MAXSIZE reached , upload the logs"
+	if [ $totalSize -ge $MAXSIZE_ATOM ]; then
+		echo_t "MAXSIZE_ATOM reached , upload the logs"
 		dmcli eRT setv Device.LogBackup.X_RDKCENTRAL-COM_SyncandUploadLogs bool true
 	fi
 

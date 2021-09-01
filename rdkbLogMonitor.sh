@@ -76,6 +76,8 @@ DeviceUP=0
 # Check if upload on reboot flag is ON. If "yes", then we will upload the 
 # log files first before starting monitoring of logs.
 
+#Set the max size of individual file size is 200K
+MAX_FILE_SIZE=200
 #---------------------------------
 # Function declarations
 #---------------------------------
@@ -160,7 +162,7 @@ processJsonResponse()
 }
 
 totalSize=0
-getLogfileSize()
+getLogFolderSize()
 {
 	curDir=`pwd`
 	#cd $LOG_PATH
@@ -171,16 +173,30 @@ getLogfileSize()
 	totalSize=0
 
         if [ -f /etc/os-release ] || [ -f /etc/device.properties ]; then
-
 		totalSize=`du -c | tail -1 | awk '{print $1}'`
         else
-
 		for f in $FILES
 		do
 			tempSize=`wc -c $f | cut -f1 -d" "`
 			totalSize=`expr $totalSize + $tempSize`
 		done
 	fi
+
+        cd $curDir
+}
+
+#Get the file size from the given folder name.
+getLogfileSize()
+{
+        curDir=`pwd`
+        cd $1
+        totalSize=0
+
+        if [ -f /etc/os-release ] || [ -f /etc/device.properties ]; then
+            totalSize=`du -c $2 | tail -1 | awk '{print $1}'`
+        else
+            totalSize=`wc -c $2 | cut -f1 -d" "`
+        fi
 
         cd $curDir
 }
@@ -779,7 +795,18 @@ do
 	    
 	    if [ ! -e $REGULAR_UPLOAD ]
 	    then
-		getLogfileSize "$LOG_PATH"
+                #Below logic added to rotate the log files present in $FILE_LIST_LIMIT_SIZE. These are not handled by rdk-logger log4crc.
+                for file in $FILE_LIST_LIMIT_SIZE
+                do
+                    actualFileName="$(eval echo \$$file)"
+                    getLogfileSize "$LOG_PATH" "$actualFileName"
+                    if [ "$totalSize" -ge "$MAX_FILE_SIZE" ]; then
+                        #backup the file_name to file_name.1 and clear the file_name contents.
+                        cp $LOG_PATH$actualFileName $LOG_PATH"$actualFileName.1"
+                        >$LOG_PATH$actualFileName
+                    fi
+                done
+                getLogFolderSize "$LOG_PATH"
 
 	        if [ "$totalSize" -ge "$MAXSIZE" ]; then
 			get_logbackup_cfg
@@ -892,7 +919,7 @@ do
 	else
 		# Suppress ls errors to prevent constant prints in non supported devices
 		file_list=`ls 2>/dev/null $LOG_SYNC_PATH`
-		if [ "$file_list" != "" ]; then
+		if [ "$file_list" != "" ] && [ "$BOX_TYPE" != "MV2PLUS" ]; then
 			echo_t "RDK_LOGGER: Disabling nvram2 logging"
 			createSysDescr
                         
