@@ -24,13 +24,7 @@ source /etc/log_timestamp.sh
 
 LOG_PATH=/rdklogs/logs
 
-# Devices that have more nvram size can override default upload threshold (1.5MB) through device.properties
-if [ -n "$LOG_UPLOAD_THRESHOLD" ]
-then
-	MAXSIZE=$LOG_UPLOAD_THRESHOLD
-else
-	MAXSIZE=1536
-fi
+MAXSIZE_ATOM=1536
 
 TFTP_PORT=69
 udpsvd -vE $ATOM_ARPING_IP $TFTP_PORT tftpd $LOG_PATH &
@@ -52,8 +46,8 @@ do
 
 	totalSize=$(du -c $LOG_PATH | tail -n1 | awk '{print $1}')
 
-	if [ $totalSize -ge $MAXSIZE ]; then
-		echo_t "MAXSIZE reached , upload the logs"
+	if [ $totalSize -ge $MAXSIZE_ATOM ]; then
+		echo_t "MAXSIZE_ATOM reached, upload the logs"
 		dmcli eRT setv Device.LogBackup.X_RDKCENTRAL-COM_SyncandUploadLogs bool true
 	fi
 done
