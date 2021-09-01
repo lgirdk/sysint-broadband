@@ -76,6 +76,8 @@ DeviceUP=0
 # Check if upload on reboot flag is ON. If "yes", then we will upload the 
 # log files first before starting monitoring of logs.
 
+#Set the max size of individual file size is 200K
+MAX_FILE_SIZE=200
 #---------------------------------
 # Function declarations
 #---------------------------------
@@ -834,6 +836,19 @@ do
 	    
 	    if [ ! -e $REGULAR_UPLOAD ]
 	    then
+		# Rotate the log files in $FILE_LIST_LIMIT_SIZE (which are not handled by rdk-logger log4crc)
+		for file in $FILE_LIST_LIMIT_SIZE
+		do
+		    actualFileName="$(eval echo \$$file)"
+		    getLogfileSize $LOG_PATH/${actualFileName}
+		    if [ "$totalSize" -ge "$MAX_FILE_SIZE" ]; then
+			# Rename file_name -> file_name.1
+			mv $LOG_PATH/${actualFileName} $LOG_PATH/${actualFileName}.1
+			# Create new empty file_name file
+			>$LOG_PATH/${actualFileName}
+		    fi
+		done
+
 		getLogfileSize "$LOG_PATH"
 
 	        if [ "$totalSize" -ge "$MAXSIZE" ]; then
@@ -944,7 +959,8 @@ do
 			    remove_hidden_files "/nvram2/logs"
 			fi
 		fi
-	else
+	elif [ "$FIRMWARE_TYPE" != "OFW" ]
+	then
 		# Suppress ls errors to prevent constant prints in non supported devices
 		file_list=`ls 2>/dev/null $LOG_SYNC_PATH`
 		if [ "$file_list" != "" ]; then
