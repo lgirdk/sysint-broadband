@@ -25,6 +25,7 @@ loop=1
 TFTP_PORT=69
 LOG_PATH=/rdklogs/logs/
 MAXSIZE_ATOM=1536
+MAX_FILE_SIZE_ATOM=300
 
 udpsvd -vE $ATOM_ARPING_IP $TFTP_PORT tftpd $LOG_PATH &
 
@@ -57,6 +58,19 @@ do
 	currdir=`pwd`
 	cd $LOG_PATH
 	totalSize=0
+
+	#Below logic added to rotate the log files present in $FILE_LIST_LIMIT_SIZE_ATOM. These are not handled by rdk-logger log4crc.
+	for file in $FILE_LIST_LIMIT_SIZE_ATOM
+	do
+		actualFileName="$(eval echo \$$file)"
+		totalSize=`du -c $LOG_PATH$actualFileName | tail -1 | awk '{print $1}'`
+		if [ "$totalSize" -ge "$MAX_FILE_SIZE_ATOM" ]; then
+			#backup the file_name to file_name.1 and clear the file_name contents.
+			cp $LOG_PATH$actualFileName $LOG_PATH"$actualFileName.1"
+			>$LOG_PATH$actualFileName
+		fi
+	done
+
         if [ -f /etc/os-release ] || [ -f /etc/device.properties ]; then
 		totalSize=`du -c | tail -1 | awk '{print $1}'`
         else
