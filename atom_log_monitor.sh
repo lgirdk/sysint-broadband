@@ -25,6 +25,7 @@ source /etc/log_timestamp.sh
 LOG_PATH=/rdklogs/logs
 
 MAXSIZE_ATOM=5000
+MAX_FILE_SIZE_ATOM=300
 
 TFTP_PORT=69
 udpsvd -vE $ATOM_ARPING_IP $TFTP_PORT tftpd $LOG_PATH &
@@ -43,6 +44,19 @@ done
 while :
 do
 	sleep 60
+
+	# Rotate the log files in FILE_LIST_LIMIT_SIZE_ATOM (which are not handled by rdk-logger log4crc)
+	for file in $FILE_LIST_LIMIT_SIZE_ATOM
+	do
+		actualFileName="$(eval echo \$$file)"
+		totalSize=$(du -c $LOG_PATH/$actualFileName | tail -n1 | awk '{print $1}')
+		if [ "$totalSize" -ge "$MAX_FILE_SIZE_ATOM" ]; then
+			# Copy file_name -> file_name.1 and truncate the original file.
+			# Apps have file_name open, so it should not be moved / renamed.
+			cp $LOG_PATH/${actualFileName} $LOG_PATH/${actualFileName}.1
+			>$LOG_PATH/${actualFileName}
+		fi
+	done
 
 	totalSize=$(du -c $LOG_PATH | tail -n1 | awk '{print $1}')
 
