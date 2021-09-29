@@ -162,27 +162,8 @@ processJsonResponse()
 totalSize=0
 getLogfileSize()
 {
-	curDir=`pwd`
-	#cd $LOG_PATH
-#	cd $LOGTEMPPATH
-	cd $1
-	FILES=`ls`
-	tempSize=0
-	totalSize=0
-
-        if [ -f /etc/os-release ] || [ -f /etc/device.properties ]; then
-
-		totalSize=`du -c | tail -1 | awk '{print $1}'`
-        else
-
-		for f in $FILES
-		do
-			tempSize=`wc -c $f | cut -f1 -d" "`
-			totalSize=`expr $totalSize + $tempSize`
-		done
-	fi
-
-        cd $curDir
+	# Argument may be a file or a directory
+	totalSize=$(du -c $1 | tail -n1 | awk '{print $1}')
 }
 
 getTFTPServer()
