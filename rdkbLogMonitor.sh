@@ -222,13 +222,6 @@ then
 	backupenable=$default_logbackup_enable
 fi
 
-#isNvram2Supported="no"
-#if [ -f /etc/device.properties ]
-#then
-#   isNvram2Supported=`cat /etc/device.properties | grep NVRAM2_SUPPORTED | cut -f2 -d=`
-#	
-#fi
-
 if [ "$NVRAM2_SUPPORTED" = "yes" ] && [ "$backupenable" = "true" ]
 then
 	LOGBACKUP_ENABLE="true"

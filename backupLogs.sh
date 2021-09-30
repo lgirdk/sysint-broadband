@@ -61,11 +61,6 @@ PATTERN_FILE="/tmp/pattern_file"
 nvram2Backup="false"
 backupenabled=`syscfg get logbackup_enable`
 
-#if [ -f /etc/device.properties ]
-#then
-   #nvram2Supported=`cat /etc/device.properties | grep NVRAM2_SUPPORTED | cut -f2 -d=`
-#fi
-
 if [ "$NVRAM2_SUPPORTED" = "yes" ] && [ "$backupenabled" = "true" ]
 then
    nvram2Backup="true"
