@@ -9,10 +9,7 @@ LOG_FILE="/rdklogs/logs/dcmrfc.log"
 FW_START="/nvram/.FirmwareUpgradeStartTime"
 FW_END="/nvram/.FirmwareUpgradeEndTime"
 
-if [ -f /etc/device.properties ]
-then
-    source /etc/device.properties
-fi
+. /etc/device.properties
 
 calcRebootExecTime()
 {

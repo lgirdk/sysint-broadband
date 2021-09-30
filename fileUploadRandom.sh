@@ -92,12 +92,6 @@ calcRandTimeandUpload()
     nvram2Backup="false"
     backupenabled=`syscfg get logbackup_enable`
 
-    
-#    if [ -f /etc/device.properties ]
-#    then
-#       nvram2Supported=`echo $NVRAM2_SUPPORTED`
-#    fi
-
     if [ "$NVRAM2_SUPPORTED" = "yes" ] && [ "$backupenabled" = "true" ]
     then
 	nvram2Backup="true"
