@@ -123,6 +123,8 @@ if [ "x$T2_ENABLE" == "xtrue" ]; then
 
     echo_t "$0 : Exiting ..." >> $T2_0_LOGFILE
     exit 0
+else
+    rm -f /tmp/telemetry_seekmap_*
 fi
 
 if [ "x$DCA_MULTI_CORE_SUPPORTED" = "xyes" ]; then
