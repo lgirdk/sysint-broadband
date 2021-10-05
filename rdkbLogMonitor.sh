@@ -767,6 +767,16 @@ do
 			>$LOG_PATH/${actualFileName}
 		    fi
 		done
+		# Set the file size limit to file SelfHealBootUpLogFile of nvram2 folder.
+		if [ $backupenable = "true" ] && [ -f $LOG_SYNC_PATH/$SelfHealBootUpLogFile ]; then
+		    getLogfileSize $LOG_SYNC_PATH/${SelfHealBootUpLogFile}
+		    if [ "$totalSize" -ge "$MAX_FILE_SIZE" ]; then
+		        # Rename file_name -> file_name.1
+		        mv $LOG_SYNC_PATH/${SelfHealBootUpLogFile} $LOG_SYNC_PATH/${SelfHealBootUpLogFile}.1
+		        # Create new empty file_name file
+		        >$LOG_SYNC_PATH/${SelfHealBootUpLogFile}
+		    fi
+		fi
 
 		getLogfileSize "$LOG_PATH"
 
