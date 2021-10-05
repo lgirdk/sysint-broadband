@@ -848,6 +848,16 @@ do
 			>$LOG_PATH/${actualFileName}
 		    fi
 		done
+		# Set the file size limit to file SelfHealBootUpLogFile of nvram2 folder.
+		if [ $backupenable = "true" ] && [ -f $LOG_SYNC_PATH/$SelfHealBootUpLogFile ]; then
+		    getLogfileSize $LOG_SYNC_PATH/${SelfHealBootUpLogFile}
+		    if [ "$totalSize" -ge "$MAX_FILE_SIZE" ]; then
+			# Copy file_name -> file_name.1 and truncate the original file.
+			# Apps have file_name open, so it should not be moved / renamed.
+		        cp $LOG_SYNC_PATH/${SelfHealBootUpLogFile} $LOG_SYNC_PATH/${SelfHealBootUpLogFile}.1
+		        >$LOG_SYNC_PATH/${SelfHealBootUpLogFile}
+		    fi
+		fi
 
 		getLogfileSize "$LOG_PATH"
 
