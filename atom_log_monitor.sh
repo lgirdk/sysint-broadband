@@ -51,9 +51,9 @@ do
 		actualFileName="$(eval echo \$$file)"
 		totalSize=$(du -c $LOG_PATH/$actualFileName | tail -n1 | awk '{print $1}')
 		if [ "$totalSize" -ge "$MAX_FILE_SIZE_ATOM" ]; then
-			# Rename file_name -> file_name.1
-			mv $LOG_PATH/${actualFileName} $LOG_PATH/${actualFileName}.1
-			# Create new empty file_name file
+			# Copy file_name -> file_name.1 and truncate the original file.
+			# Apps have file_name open, so it should not be moved / renamed.
+			cp $LOG_PATH/${actualFileName} $LOG_PATH/${actualFileName}.1
 			>$LOG_PATH/${actualFileName}
 		fi
 	done
