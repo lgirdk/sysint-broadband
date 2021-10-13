@@ -761,9 +761,9 @@ do
 		    actualFileName="$(eval echo \$$file)"
 		    getLogfileSize $LOG_PATH/${actualFileName}
 		    if [ "$totalSize" -ge "$MAX_FILE_SIZE" ]; then
-			# Rename file_name -> file_name.1
-			mv $LOG_PATH/${actualFileName} $LOG_PATH/${actualFileName}.1
-			# Create new empty file_name file
+			# Copy file_name -> file_name.1 and truncate the original file.
+			# Apps have file_name open, so it should not be moved / renamed.
+			cp $LOG_PATH/${actualFileName} $LOG_PATH/${actualFileName}.1
 			>$LOG_PATH/${actualFileName}
 		    fi
 		done
@@ -771,9 +771,9 @@ do
 		if [ $backupenable = "true" ] && [ -f $LOG_SYNC_PATH/$SelfHealBootUpLogFile ]; then
 		    getLogfileSize $LOG_SYNC_PATH/${SelfHealBootUpLogFile}
 		    if [ "$totalSize" -ge "$MAX_FILE_SIZE" ]; then
-		        # Rename file_name -> file_name.1
-		        mv $LOG_SYNC_PATH/${SelfHealBootUpLogFile} $LOG_SYNC_PATH/${SelfHealBootUpLogFile}.1
-		        # Create new empty file_name file
+			# Copy file_name -> file_name.1 and truncate the original file.
+			# Apps have file_name open, so it should not be moved / renamed.
+		        cp $LOG_SYNC_PATH/${SelfHealBootUpLogFile} $LOG_SYNC_PATH/${SelfHealBootUpLogFile}.1
 		        >$LOG_SYNC_PATH/${SelfHealBootUpLogFile}
 		    fi
 		fi
