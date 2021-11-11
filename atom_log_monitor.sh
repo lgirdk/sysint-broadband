@@ -45,7 +45,7 @@ while :
 do
 	sleep 60
 
-	# Rotate the log files in $$FILE_LIST_LIMIT_SIZE_ATOM (which are not handled by rdk-logger log4crc)
+	# Rotate the log files in FILE_LIST_LIMIT_SIZE_ATOM (which are not handled by rdk-logger log4crc)
 	for file in $FILE_LIST_LIMIT_SIZE_ATOM
 	do
 		actualFileName="$(eval echo \$$file)"

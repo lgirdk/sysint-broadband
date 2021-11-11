@@ -755,7 +755,7 @@ do
 	    
 	    if [ ! -e $REGULAR_UPLOAD ]
 	    then
-		# Rotate the log files in $FILE_LIST_LIMIT_SIZE (which are not handled by rdk-logger log4crc)
+		# Rotate the log files in FILE_LIST_LIMIT_SIZE (which are not handled by rdk-logger log4crc)
 		for file in $FILE_LIST_LIMIT_SIZE
 		do
 		    actualFileName="$(eval echo \$$file)"
