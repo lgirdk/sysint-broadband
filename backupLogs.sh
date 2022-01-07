@@ -59,21 +59,12 @@ LOG_FILE=$MAC"_Logs_$dt.tgz"
 needReboot="true"
 PATTERN_FILE="/tmp/pattern_file"
 
-nvram2Backup="false"
-backupenabled=`syscfg get logbackup_enable`
-
-#if [ -f /etc/device.properties ]
-#then
-   #nvram2Supported=`cat /etc/device.properties | grep NVRAM2_SUPPORTED | cut -f2 -d=`
-#fi
-
-if [ "$NVRAM2_SUPPORTED" = "yes" ] && [ "$backupenabled" = "true" ]
+if [ "$NVRAM2_SUPPORTED" = "yes" ] && [ "$(syscfg get logbackup_enable)" = "true" ]
 then
    nvram2Backup="true"
 else
    nvram2Backup="false"
 fi
-
 
 backup_log_pidCleanup()
 {
