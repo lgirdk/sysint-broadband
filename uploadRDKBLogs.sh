@@ -199,18 +199,11 @@ CURL_BIN="curl"
 if [ "$5" != "" ]; then
 	nvram2Backup=$5
 else
-    backupenabled=`syscfg get logbackup_enable`
-    #nvram2Supported="no"
- #   if [ -f /etc/device.properties ]
-  #  then
-  #     nvram2Supported=`cat /etc/device.properties | grep NVRAM2_SUPPORTED | cut -f2 -d=`
-  #  fi
-
-    if [ "$NVRAM2_SUPPORTED" = "yes" ] && [ "$backupenabled" = "true" ]
+    if [ "$NVRAM2_SUPPORTED" = "yes" ] && [ "$(syscfg get logbackup_enable)" = "true" ]
     then
-       nvram2Backup="true"
+        nvram2Backup="true"
     else
-       nvram2Backup="false"
+        nvram2Backup="false"
     fi
 fi
 
