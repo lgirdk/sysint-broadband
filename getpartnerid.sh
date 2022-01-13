@@ -19,48 +19,18 @@
 # limitations under the License.
 ##################################################################################
 
-LOG_FOLDER="/rdklogs"
-
-. /lib/rdk/t2Shared_api.sh
 . /etc/device.properties
 
-CONSOLEFILE="$LOG_FOLDER/logs/Consolelog.txt.0"
-
-echo_time()
-{
-	echo "`date +"%y%m%d-%T.%6N"` getPartnerId() called from: $0 -  $1"
-}
-
-# Function to get partner_id
 getPartnerId()
 {
-	# Get PartnerID set in the system via syscfg get command
-	partner_id=`syscfg get PartnerID`
-
-	# Try "dmcli" to retrieve partner_id if "sysconf" returned null. It's a fallback check.
-	if [ -z "$partner_id" ] || [ -n "$(echo $partner_id | grep -i error)" ]; then
-		partner_id=`dmcli eRT getv Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.PartnerId | grep string | awk '{print $5}'`
-
-		# Check for PartnerID in device.properties if its not set already.
-		if [ -z "$partner_id" ]; then
-			# PARTNER_ID is set from sourcing /etc/device.properties
-			partner_id=`echo $PARTNER_ID`
-			if [ -z "$partner_id" ]; then
-				echo_time "partner_id is not available from syscfg.db or tr181 param or device.properties, defaulting to comcast..">>$CONSOLEFILE
-				t2CountNotify "SYS_ERROR_PartnerId_missing_sycfg"
-				echo "comcast"
-			else
-				echo_time "partner_id is not available from syscfg.db or tr181 param, value retrieved from device.properties : $partner_id">>$CONSOLEFILE
-				echo "$partner_id"
-			fi
-		else
-			echo_time "partner_id is not available from syscfg.db, value retrieved from tr181 param : $partner_id">>$CONSOLEFILE
-			echo "$partner_id"
-		fi
+	if [ -n "${PARTNER_ID}" ]
+	then
+		partner_id="${PARTNER_ID}"
 	else
-		echo_time "partner_id retrieved from syscfg.db : $partner_id">>$CONSOLEFILE
-		echo "$partner_id"
+		partner_id="RDKM"
 	fi
+
+	echo "$partner_id"
 }
 
 case=$1
