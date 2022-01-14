@@ -164,7 +164,7 @@ calcRandTimeandUpload()
     fi
 
     # Log factory_programmed partnerID from XB6 platforms
-    if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "MV2PLUS" ]; then
+    if [ "$BOX_TYPE" = "XB6" ]; then
        echo_t "RDK Logger : calling log_factoryPartnerId.sh"
        sh $RDK_LOGGER_PATH/log_factoryPartnerId.sh &
     fi
