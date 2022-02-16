@@ -21,6 +21,7 @@
 source /etc/device.properties
 source /etc/logFiles.properties
 source /etc/log_timestamp.sh
+source /lib/rdk/t2Shared_api.sh
 
 LOG_PATH=/rdklogs/logs
 
@@ -63,5 +64,14 @@ do
 	if [ $totalSize -ge $MAXSIZE_ATOM ]; then
 		echo_t "MAXSIZE_ATOM reached, upload the logs"
 		dmcli eRT setv Device.LogBackup.X_RDKCENTRAL-COM_SyncandUploadLogs bool true
+	fi
+
+	NVRAM_USAGE=$(df /nvram | sed -n 's/.* \([0-9]\+\)% .*/\1/p')
+	if [ "$NVRAM_USAGE" -ge 90 ]; then
+		t2ValNotify "NVRAM_USAGE_ATOM" "$NVRAM_USAGE"
+		echo "ATOM nvram usage is ${NVRAM_USAGE}%" >> /rdklogs/logs/$AtomConsoleLog
+		echo "*********** dump file usage in nvram **************" >> /rdklogs/logs/$AtomConsoleLog
+		echo "`du -ah /nvram`" >> /rdklogs/logs/$AtomConsoleLog
+		echo "******************************" >> /rdklogs/logs/$AtomConsoleLog
 	fi
 done
