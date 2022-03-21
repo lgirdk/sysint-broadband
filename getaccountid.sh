@@ -55,7 +55,7 @@ accountId=`syscfg get AccountID`
 
 #Try "dmcli" to retrieve accountId if "sysconf" returned null. It's a fallback check.
 if [ "$accountId" == "" ];then
-      accountId=`dmcli eRT getv Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.AccountInfo.AccountID | grep string | awk '{print $5}'`
+      accountId=`dmcli eRT retv Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.AccountInfo.AccountID`
 
       if [ "$accountId" == "" ]; then
            echo_time "account_id is not available from syscfg.db or tr181 param, defaulting to Unknown...">>$CONSOLEFILE
