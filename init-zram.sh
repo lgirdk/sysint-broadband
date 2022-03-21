@@ -36,7 +36,7 @@ do
 done
 
 #check if zram is enabled by RFC, exit if not enabled
-ZRAM_RFC_ENABLE=`dmcli eRT getv Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MEMSWAP.Enable  | grep value | cut -d ":" -f 3 | tr -d ' '`
+ZRAM_RFC_ENABLE=`dmcli eRT retv Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.MEMSWAP.Enable`
 if [ "x$ZRAM_RFC_ENABLE" != "xtrue" ]; then
     zram_log "zram is disabled"
     exit 1
