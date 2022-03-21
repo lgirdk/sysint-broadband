@@ -166,7 +166,7 @@ conn_str="Direct"
 CodebigAvailable=0
 XPKI_MTLS_MAX_TRIES=0
 xpkiMtlsRFC=`syscfg get UseXPKI_Enable`
-encryptionEnable=`dmcli eRT getv Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.EncryptCloudUpload.Enable | grep value | cut -d ":" -f 3 | tr -d ' '`
+encryptionEnable=`dmcli eRT retv Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.EncryptCloudUpload.Enable`
 URLENCODE_STRING=""
 
 checkXpkiMtlsBasedLogUpload()
@@ -209,7 +209,7 @@ fi
 
 UploadPath=$6
 
-SECONDV=`dmcli eRT getv Device.X_CISCO_COM_CableModem.TimeOffset | grep value | cut -d ":" -f 3 | tr -d ' ' `
+SECONDV=`dmcli eRT retv Device.X_CISCO_COM_CableModem.TimeOffset`
 
 
 getFWVersion()

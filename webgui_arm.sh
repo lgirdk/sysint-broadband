@@ -185,7 +185,7 @@ restartEventsForRfCp()
 checkRfStatus()
 {
    noRfCp=0
-   RF_SIGNAL_STATUS=`dmcli eRT getv Device.DeviceInfo.X_RDKCENTRAL-COM_CableRfSignalStatus | grep value | cut -f3 -d : | cut -f2 -d" "`
+   RF_SIGNAL_STATUS=`dmcli eRT retv Device.DeviceInfo.X_RDKCENTRAL-COM_CableRfSignalStatus`
    isInRfCp=`syscfg get rf_captive_portal`
    echo_t "WEBGUI: values RF_SIGNAL_STATUS : $RF_SIGNAL_STATUS , isInRfCp: $isInRfCp"
    if [ "$RF_SIGNAL_STATUS" = "false" ] || [ "$isInRfCp" = "true" ]
