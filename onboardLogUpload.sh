@@ -44,7 +44,7 @@ CURL_BIN="curl"
 UseCodeBig=0
 conn_str="Direct"
 CodebigAvailable=0
-encryptionEnable=`dmcli eRT getv Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.EncryptCloudUpload.Enable | grep value | cut -d ":" -f 3 | tr -d ' '`
+encryptionEnable=`dmcli eRT retv Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.EncryptCloudUpload.Enable`
 URLENCODE_STRING=""
 
 CODEBIG_BLOCK_TIME=1800
