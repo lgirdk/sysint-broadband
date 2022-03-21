@@ -55,7 +55,7 @@ CodebigAvailable=0
 XPKI_MTLS_MAX_TRIES=0
 xpkiMtlsRFC=`syscfg get UseXPKI_Enable`
 mTlsLogUpload=`syscfg get mTlsLogUpload_Enable`
-encryptionEnable=`dmcli eRT getv Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.EncryptCloudUpload.Enable | grep value | cut -d ":" -f 3 | tr -d ' '`
+encryptionEnable=`dmcli eRT retv Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.EncryptCloudUpload.Enable`
 URLENCODE_STRING=""
 
 checkXpkiMtlsBasedLogUpload()
@@ -91,7 +91,7 @@ timeToUpload=`date`
 LOG_FILE=$MAC"_Logs_$dt.tgz"
 PATTERN_FILE="/tmp/pattern_file"
 WAN_INTERFACE=$(getWanInterfaceName)
-SECONDV=`dmcli eRT getv Device.X_CISCO_COM_CableModem.TimeOffset | grep value | cut -d ":" -f 3 | tr -d ' ' `
+SECONDV=`dmcli eRT retv Device.X_CISCO_COM_CableModem.TimeOffset`
 UPLOAD_LOG_STATUS="/tmp/upload_log_status"
 SYS_DB_FILE="/nvram/syscfg.db"
 

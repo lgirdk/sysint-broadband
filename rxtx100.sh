@@ -89,14 +89,14 @@ if [ "$tm_d" -gt "300" ]; then
 
 
 	t="RDKB_WiFiClientDrop"
-	count=`dmcli eRT getv Device.Hosts.HostNumberOfEntries| grep type | cut -d':' -f3 | tr -d " "`
+	count=`dmcli eRT retv Device.Hosts.HostNumberOfEntries`
 	witotoal="0";
 	wlost="0";
 	for i in `seq 1 $count`; do
-		iface=`dmcli eRT getv Device.Hosts.Host.$i.Layer1Interface | grep type | cut -d':' -f3 | tr -d " "`
+		iface=`dmcli eRT retv Device.Hosts.Host.$i.Layer1Interface`
 		if [ "$iface" == "Device.WiFi.SSID.1" ] || [ "$iface" == "Device.WiFi.SSID.2" ]; then
 			witotoal=$(($witotoal+1));
-			ip=`dmcli eRT getv Device.Hosts.Host.$i.IPAddress | grep type | cut -d':' -f3`
+			ip=`dmcli eRT retv Device.Hosts.Host.$i.IPAddress`
 			res=`ping -c1 -W2 $ip | grep time`
 			if [ -z "$res" ]; then
 				wlost=$(($wlost+1));
