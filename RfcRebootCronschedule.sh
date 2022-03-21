@@ -33,7 +33,7 @@ calcRebootExecTime()
         fi
 
         #Get local time off set
-        time_offset=`dmcli eRT getv Device.Time.TimeOffset | grep "value:" | cut -d ":" -f 3 | tr -d ' '`
+        time_offset=`dmcli eRT retv Device.Time.TimeOffset`
 
 
         #Maintence start and end time in local

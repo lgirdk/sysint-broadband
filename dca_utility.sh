@@ -73,7 +73,7 @@ MAX_SSH_RETRY=3
 
 ## For simple T2.0 migration consider only below steps for T2 Enable mode
 if [ "$BOX_TYPE" = "XB3" ] && [ "$CORE_TYPE" = "atom" ]; then
-    T2_ENABLE="`dmcli eRT getv Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.Telemetry.Enable | grep value | awk '{print $5}'`"
+    T2_ENABLE="`dmcli eRT retv Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.Telemetry.Enable`"
 else
     T2_ENABLE="`syscfg get T2Enable`"
 fi
@@ -277,7 +277,7 @@ isNum()
 getEstbMac()
 {
 
-    estbMac=`dmcli eRT getv Device.DeviceInfo.X_COMCAST-COM_WAN_MAC  | grep type: | awk '{print $5}'|tr '[:lower:]' '[:upper:]'`
+    estbMac=`dmcli eRT retv Device.DeviceInfo.X_COMCAST-COM_WAN_MAC |tr '[:lower:]' '[:upper:]'`
     
     if [ "$estbMac" ]; then
        echo "$estbMac"
@@ -296,7 +296,7 @@ getEstbMac()
 # Function to get erouter0 ipv4 address
 getErouterIpv4()
 {
-    erouter_ipv4=`dmcli eRT getv Device.DeviceInfo.X_COMCAST-COM_WAN_IP | grep value | awk '{print $5}'`
+    erouter_ipv4=`dmcli eRT retv Device.DeviceInfo.X_COMCAST-COM_WAN_IP`
     if [ "$erouter_ipv4" != "" ];then
         echo $erouter_ipv4
     else
@@ -307,7 +307,7 @@ getErouterIpv4()
 # Function to get erouter0 ipv6 address
 getErouterIpv6()
 {
-    erouter_ipv6=`dmcli eRT getv Device.DeviceInfo.X_COMCAST-COM_WAN_IPv6 | grep value | awk '{print $5}'`
+    erouter_ipv6=`dmcli eRT retv Device.DeviceInfo.X_COMCAST-COM_WAN_IPv6`
     if [ "$erouter_ipv6" != "" ];then
         echo $erouter_ipv6
     else
@@ -401,9 +401,9 @@ scheduleCron()
     fi
 
 	#During diagnostic mode need to apply the cron schedule value through this custom configuration
-	DiagnosticMode=`dmcli eRT getv Device.SelfHeal.X_RDKCENTRAL-COM_DiagnosticMode | grep value | cut -f3 -d : | cut -f2 -d" "`
+	DiagnosticMode=`dmcli eRT retv Device.SelfHeal.X_RDKCENTRAL-COM_DiagnosticMode`
 	if [ "$DiagnosticMode" == "true" ];then
-	LogUploadFrequency=`dmcli eRT getv Device.SelfHeal.X_RDKCENTRAL-COM_DiagMode_LogUploadFrequency | grep value | cut -f3 -d : | cut -f2 -d" "`
+	LogUploadFrequency=`dmcli eRT retv Device.SelfHeal.X_RDKCENTRAL-COM_DiagMode_LogUploadFrequency`
 		if [ "$LogUploadFrequency" != "" ]; then
 			cron=''
 			cron="*/$LogUploadFrequency * * * *"

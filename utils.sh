@@ -88,9 +88,9 @@ getIPAddress()
 getCMIPAddress()
 {
     if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "TCCBR" ] || [ "$BOX_TYPE" = "MV2PLUS" ]; then
-       address=`dmcli eRT getv Device.X_CISCO_COM_CableModem.IPv6Address | grep string | awk '{print $5}'`
+       address=`dmcli eRT retv Device.X_CISCO_COM_CableModem.IPv6Address`
        if [ ! "$address" ]; then
-          address=`dmcli eRT getv Device.X_CISCO_COM_CableModem.IPAddress | grep string | awk '{print $5}'`
+          address=`dmcli eRT retv Device.X_CISCO_COM_CableModem.IPAddress`
        fi
     elif [ "$BOX_TYPE" = "HUB4" ] || [ "$BOX_TYPE" = "SR300" ] || [ "$BOX_TYPE" = "SE501" ]; then
        CURRENT_WAN_IPV6_STATUS=`sysevent get ipv6_connection_state`
@@ -115,9 +115,9 @@ getCMIPAddress()
 getErouterIPAddress()
 {
     if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "TCCBR" ] || [ "$BOX_TYPE" = "MV2PLUS" ]; then
-        address=`dmcli eRT getv Device.DeviceInfo.X_COMCAST-COM_WAN_IPv6 | grep string | awk '{print $5}'`
+        address=`dmcli eRT retv Device.DeviceInfo.X_COMCAST-COM_WAN_IPv6`
         if [ ! "$address" ]; then
-            address=`dmcli eRT getv Device.DeviceInfo.X_COMCAST-COM_WAN_IP | grep string | awk '{print $5}'`
+            address=`dmcli eRT retv Device.DeviceInfo.X_COMCAST-COM_WAN_IP`
         fi
     elif [ "$BOX_TYPE" = "HUB4" ] || [ "$BOX_TYPE" = "SR300" ] || [ "$BOX_TYPE" = "SE501" ]; then
         CURRENT_WAN_IPV6_STATUS=`sysevent get ipv6_connection_state`
@@ -151,9 +151,9 @@ processCheck()
 getMacAddress()
 {
     if [ $BOX_TYPE = "XF3" ]; then                           
-        mac=`dmcli eRT getv Device.DPoE.Mac_address | grep value | awk '{print $5}'`
+        mac=`dmcli eRT retv Device.DPoE.Mac_address`
     elif [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "TCCBR" ] || [ "$BOX_TYPE" = "MV2PLUS" ];then
-        mac=`dmcli eRT getv Device.X_CISCO_COM_CableModem.MACAddress | grep value | awk '{print $5}'`
+        mac=`dmcli eRT retv Device.X_CISCO_COM_CableModem.MACAddress`
     elif [ "$BOX_TYPE" = "HUB4" ] || [ "$BOX_TYPE" = "SR300" ] || [ "$BOX_TYPE" = "SE501" ]; then
         #FEATURE_RDKB_WAN_MANAGER
         wan_if=`syscfg get wan_physical_ifname`
@@ -218,7 +218,7 @@ getModel()
   if [ $BOX_TYPE = "XF3" ]; then
      modelName=$(sed -n 's/^imagename[:=]"\?\([^"]*\)"\?/\1/p' /version.txt | cut -d "_" -f 1)
   else
-     modelName=`dmcli eRT getv Device.DeviceInfo.ModelName | grep value | awk '{print $5}'`
+     modelName=`dmcli eRT retv Device.DeviceInfo.ModelName`
      if [ "$modelName" = "" ]
      then
             modelName=`echo $MODEL_NUM`
