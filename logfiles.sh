@@ -124,7 +124,7 @@ createSysDescr()
 	swVersion=`dmcli eRT retv Device.DeviceInfo.SoftwareVersion`
 	sw_fw_version="$adswVersion"_"$swVersion"
 
-	modelName=`dmcli eRT getv Device.DeviceInfo.ModelName`
+	modelName=`dmcli eRT retv Device.DeviceInfo.ModelName`
 	echo_t "RDKB_SYSDESCR : $description HW_REV: $hwRevision; VENDOR: $vendor; BOOTR: $bootloader; SW_REV: $sw_fw_version; MODEL: $modelName "
 	
 }
