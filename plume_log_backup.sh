@@ -1,3 +1,4 @@
+#!/bin/sh
 ##################################################################################
 # If not stated otherwise in this file or this component's Licenses.txt file the
 # following copyright and licenses apply:
@@ -22,8 +23,6 @@
 #/rdklogs/logs to /tmp. The back up logs are made available to plume
 #log pull.
 #------------------------------------------------------------------------------
-
-#!/bin/sh
 
 #Maximum size of *.1 log file (in bytes)
 BCKUP_MAXSIZE=800000
@@ -52,10 +51,10 @@ else
 fi
 
 #Log files need to backup for MV2+
-MV2plus_Specific_Logs=(wifi_vendor.log wifi_vendor_apps.log wifi_vendor_hal.log WiFilog.txt.0 WiFilog.txt.1 wifihealth.txt MeshAgentLog.txt.0 MeshAgentLog.txt.1)
+MV2plus_Specific_Logs="wifi_vendor.log wifi_vendor_apps.log wifi_vendor_hal.log WiFilog.txt.0 WiFilog.txt.1 wifihealth.txt MeshAgentLog.txt.0 MeshAgentLog.txt.1"
 
 #Common log files
-Common_Logs=(SelfHealAggressive.txt SelfHeal.txt.0 SelfHeal.txt.0.1 ArmConsolelog.txt.0 ArmConsolelog.txt.0.1 GWPROVLog.txt.0 GWPROVLog.txt.1 Consolelog.txt.0 Consolelog.txt.0.1)
+Common_Logs="SelfHealAggressive.txt SelfHeal.txt.0 SelfHeal.txt.0.1 ArmConsolelog.txt.0 ArmConsolelog.txt.0.1 GWPROVLog.txt.0 GWPROVLog.txt.1 Consolelog.txt.0 Consolelog.txt.0.1"
 
 DoBackup_1()
 {
@@ -173,12 +172,12 @@ CreateLogBackUp()
 
 #Backup logs specific for MV2+
 if [ "$BOX_TYPE" = "MV2PLUS" ]; then
-   for file in ${MV2plus_Specific_Logs[@]}; do
+   for file in $MV2plus_Specific_Logs ; do
       CreateLogBackUp $file
    done
 fi
 
 #Backup common logs
-for file in ${Common_Logs[@]}; do
-        CreateLogBackUp $file
+for file in $Common_Logs ; do
+    CreateLogBackUp $file
 done

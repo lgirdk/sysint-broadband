@@ -1,3 +1,4 @@
+#!/bin/sh
 ##################################################################################
 # If not stated otherwise in this file or this component's Licenses.txt file the
 # following copyright and licenses apply:
@@ -21,8 +22,6 @@
 #This file run as scheduled task and backup selcted logs from /rdklogs/logs
 # to /tmp. The backup logs are made available for plume log pull
 #-------------------------------------------------------------------------------
-
-#!/bin/sh
 
 #Maximum size of *.1 log file
 BCKUP_MAXSIZE=800000
@@ -50,7 +49,7 @@ else
     touch /tmp/timestamp.sh
 fi
 
-Log_files=(wifi_vendor.log wifi_vendor_apps.log wifi_vendor_hal.log WiFilog.txt.0 WiFilog.txt.1 wifihealth.txt SelfHeal.txt.0 SelfHeal.txt.0.1 MeshAgentLog.txt.0 MeshAgentLog.txt.1 AtomConsolelog.txt.0 AtomConsolelog.txt.0.1)
+Log_files="wifi_vendor.log wifi_vendor_apps.log wifi_vendor_hal.log WiFilog.txt.0 WiFilog.txt.1 wifihealth.txt SelfHeal.txt.0 SelfHeal.txt.0.1 MeshAgentLog.txt.0 MeshAgentLog.txt.1 AtomConsolelog.txt.0 AtomConsolelog.txt.0.1"
 
 DoBackup_1()
 {
@@ -145,7 +144,7 @@ CreateLogBackUp()
 }
 
 #Backup ATOM logs
-for file in ${Log_files[@]}; do
-   CreateLogBackUp $file
+for file in $Log_files ; do
+    CreateLogBackUp $file
 done
 
