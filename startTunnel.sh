@@ -28,6 +28,8 @@ if [ -f /lib/rdk/t2Shared_api.sh ]; then
                 source /lib/rdk/t2Shared_api.sh
 fi
 
+SSH_CLIENT="/usr/bin/ssh"
+SSH_DAEMON="/usr/sbin/dropbear"
 WAN_INTERFACE=$(getWanInterfaceName)
 usage()
 {
@@ -60,6 +62,16 @@ case $oper in
              exit 1
              ;;
            start)
+            if [ "$FIRMWARE_TYPE" = "OFW" ]; then
+                # Start SSH daemon on demand
+                start-stop-daemon -S -x $SSH_DAEMON -m -b -p /var/tmp/rsshd.pid -- -B -F
+
+                args=`echo $* | sed "s/\[CM_IP\]/localhost/g"`
+
+                start-stop-daemon -S -x $SSH_CLIENT -m -b -p /var/tmp/rssh.pid -- $args
+                sleep 10
+                exit 1
+            fi
          WAN_INTERFACE=$(getWanInterfaceName)
          DEF_WAN_INTERFACE=$(getWanMacInterfaceName)
 	     if [ -f "/nvram/ETHWAN_ENABLE" ];then
@@ -163,6 +175,14 @@ case $oper in
              exit 1
              ;;
            stop)
+             if [ "$FIRMWARE_TYPE" = "OFW" ]; then
+                 # use start-stop-daemon to kill rssh and sshd
+                 start-stop-daemon -K -p /var/tmp/rssh.pid
+                 rm /var/tmp/rssh.pid
+                 start-stop-daemon -K -p /var/tmp/rsshd.pid
+                 rm /var/tmp/rsshd.pid
+                 exit 1
+             fi
              cat /var/tmp/rssh.pid |xargs kill -9
              rm /var/tmp/rssh.pid
              exit 1
