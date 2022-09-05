@@ -64,8 +64,17 @@ case $oper in
                 start-stop-daemon -S -x $SSH_DAEMON -m -b -p /var/tmp/rsshd.pid -- -B -F
 
                 args=`echo $* | sed "s/\[CM_IP\]/localhost/g"`
+                if [[ "$*" =~ "passwd=" ]]; then
+                    # Assumption: host password is the first argument
+                    passwd="$(awk '{print $1}'<<<$args | cut -d '=' -f2)"
+                    args="$(awk '{$1 = ""; print $0;}' <<<$args)" # Update SSH args to exclude login password
+                fi
 
-                start-stop-daemon -S -x $SSH_CLIENT -m -b -p /var/tmp/rssh.pid -- $args
+                if [ -z "$passwd" ]; then
+                    start-stop-daemon -S -x $SSH_CLIENT -m -b -p /var/tmp/rssh.pid -- $args
+                else
+                    DROPBEAR_PASSWORD="$passwd" start-stop-daemon -S -x $SSH_CLIENT -m -b -p /var/tmp/rssh.pid -- $args
+                fi
                 sleep 10
                 exit 1
             fi
