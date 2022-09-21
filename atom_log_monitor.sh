@@ -24,7 +24,7 @@ source /etc/log_timestamp.sh
 
 LOG_PATH=/rdklogs/logs
 
-MAXSIZE_ATOM=1536
+MAXSIZE_ATOM=5000
 
 TFTP_PORT=69
 udpsvd -vE $ATOM_ARPING_IP $TFTP_PORT tftpd $LOG_PATH &
