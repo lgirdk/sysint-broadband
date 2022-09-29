@@ -10,10 +10,7 @@ FW_START="/nvram/.FirmwareUpgradeStartTime"
 FW_END="/nvram/.FirmwareUpgradeEndTime"
 RFC_REBOOT_SCHEDULED="/tmp/.RfcwaitingReboot"
 
-if [ -f /etc/device.properties ]
-then
-    source /etc/device.properties
-fi
+. /etc/device.properties
 
 calcRebootExecTime()
 {
