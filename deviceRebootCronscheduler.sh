@@ -17,10 +17,7 @@ RFC_REBOOT_SCHEDULED="/tmp/.RfcwaitingReboot"
 DOWNLOAD_INPROGRESS="/tmp/.downloadingfw"
 REBOOT_WAIT="/tmp/.waitingreboot"
 
-if [ -f /etc/device.properties ]
-then
-    source /etc/device.properties
-fi
+. /etc/device.properties
 
 if [ -z $LOG_FILE ]
 then
