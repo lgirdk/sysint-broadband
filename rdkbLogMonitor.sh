@@ -78,6 +78,13 @@ DeviceUP=0
 
 #Set the max size of individual file size is 200K
 MAX_FILE_SIZE=200
+
+NVRAM_LOG_PATH="/nvram/log/"
+if [ "$BOX_TYPE" = "MV1" ]; then
+	NVRAM_MAXSIZE=100
+else
+	NVRAM_MAXSIZE=800
+fi
 #---------------------------------
 # Function declarations
 #---------------------------------
@@ -865,6 +872,16 @@ do
 			>$LOG_PATH/${actualFileName}
 		    fi
 		done
+
+		#In MV1, the log limit to the files in /nvram/log/ is set to 200k which is high and may lead to /nvram full.
+		#So, we are flushing the logs, if the cumulative size of the folder reaches more than 100k.
+		#For other platforms we are setting the MAX size limit to value to 800k.
+		getLogfileSize "$NVRAM_LOG_PATH"
+		if [ "$totalSize" -ge "$NVRAM_MAXSIZE" ]; then
+			backupAllLogs "$NVRAM_LOG_PATH" "$LOG_BACK_UP_PATH" "cp"
+			rm -rf "$NVRAM_LOG_PATH"*
+		fi
+
 		# Set the file size limit to file SelfHealBootUpLogFile of nvram2 folder.
 		if [ $backupenable = "true" ] && [ -f $LOG_SYNC_PATH/$SelfHealBootUpLogFile ]; then
 		    getLogfileSize $LOG_SYNC_PATH/${SelfHealBootUpLogFile}
