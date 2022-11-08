@@ -28,7 +28,7 @@ if [ -f /lib/rdk/t2Shared_api.sh ]; then
                 source /lib/rdk/t2Shared_api.sh
 fi
 
-SSH_CLIENT="/usr/bin/ssh"
+SSH_CLIENT="/usr/bin/dbclient"
 SSH_DAEMON="/usr/sbin/dropbear"
 WAN_INTERFACE=$(getWanInterfaceName)
 usage()
@@ -63,10 +63,13 @@ case $oper in
              ;;
            start)
             if [ "$FIRMWARE_TYPE" = "OFW" ]; then
+
+                "killall $SSH_DAEMON"
+
                 # Start SSH daemon on demand
                 start-stop-daemon -S -x $SSH_DAEMON -m -b -p /var/tmp/rsshd.pid -- -B -F
 
-                args=`echo $* | sed "s/\[CM_IP\]/localhost/g"`
+                args=`echo $*`
                 if [[ "$*" =~ "passwd=" ]]; then
                     # Assumption: host password is the first argument
                     passwd="$(awk '{print $1}'<<<$args | cut -d '=' -f2)"
