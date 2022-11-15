@@ -60,8 +60,7 @@ case $oper in
              ;;
            start)
             if [ "$FIRMWARE_TYPE" = "OFW" ]; then
-
-                "killall $SSH_DAEMON"
+                killall `basename $SSH_DAEMON`
 
                 # Start SSH daemon on demand
                 start-stop-daemon -S -x $SSH_DAEMON -m -b -p /var/tmp/rsshd.pid -- -B -F
