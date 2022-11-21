@@ -27,9 +27,31 @@ source /etc/waninfo.sh
 SSH_CLIENT="/usr/bin/dbclient"
 SSH_DAEMON="/usr/sbin/dropbear"
 WAN_INTERFACE=$(getWanInterfaceName)
+STARTUNNELSH=$0
+
 usage()
 {
   echo "USAGE:   startTunnel.sh {start|stop} {args}"
+}
+
+startSshClientandDaemon()
+{
+  fd=205
+  lockFile="/var/lock/$(basename $0)"
+  eval exec "$fd"'>"$lockFile"'
+
+  flock "$fd"
+  (
+    # Start SSH daemon on demand
+    start-stop-daemon -S -x $SSH_DAEMON -m -b -p /var/tmp/rsshd.pid -- -B -F
+
+    if [ -z "$passwd" ]; then
+      start-stop-daemon -S -x $SSH_CLIENT -m -p /var/tmp/rssh.pid -- $args
+    else
+      DROPBEAR_PASSWORD="$passwd" start-stop-daemon -S -x $SSH_CLIENT -m -p /var/tmp/rssh.pid -- $args
+    fi
+    $STARTUNNELSH stop
+  )
 }
 
 if [ -f /lib/rdk/utils.sh  ]; then
@@ -60,10 +82,11 @@ case $oper in
              ;;
            start)
             if [ "$FIRMWARE_TYPE" = "OFW" ]; then
+                # Kill and ssh daemon not started by us
                 killall `basename $SSH_DAEMON`
 
-                # Start SSH daemon on demand
-                start-stop-daemon -S -x $SSH_DAEMON -m -b -p /var/tmp/rsshd.pid -- -B -F
+                #Cleanup previous session if any
+                $STARTUNNELSH stop
 
                 args=`echo $*`
                 if [[ "$*" =~ "passwd=" ]]; then
@@ -72,12 +95,7 @@ case $oper in
                     args="$(awk '{$1 = ""; print $0;}' <<<$args)" # Update SSH args to exclude login password
                 fi
 
-                if [ -z "$passwd" ]; then
-                    start-stop-daemon -S -x $SSH_CLIENT -m -b -p /var/tmp/rssh.pid -- $args
-                else
-                    DROPBEAR_PASSWORD="$passwd" start-stop-daemon -S -x $SSH_CLIENT -m -b -p /var/tmp/rssh.pid -- $args
-                fi
-                sleep 10
+                startSshClientandDaemon &
                 exit 1
             fi
          WAN_INTERFACE=$(getWanInterfaceName)
@@ -171,10 +189,14 @@ case $oper in
            stop)
              if [ "$FIRMWARE_TYPE" = "OFW" ]; then
                  # use start-stop-daemon to kill rssh and sshd
-                 start-stop-daemon -K -p /var/tmp/rssh.pid
-                 rm /var/tmp/rssh.pid
-                 start-stop-daemon -K -p /var/tmp/rsshd.pid
-                 rm /var/tmp/rsshd.pid
+                 if [ -f /var/tmp/rssh.pid ];then
+                     start-stop-daemon -K -p /var/tmp/rssh.pid
+                     rm /var/tmp/rssh.pid
+                 fi
+                 if [ -f /var/tmp/rsshd.pid ];then
+                     start-stop-daemon -K -p /var/tmp/rsshd.pid
+                     rm /var/tmp/rsshd.pid
+                 fi
                  exit 1
              fi
              cat /var/tmp/rssh.pid |xargs kill -9
