@@ -44,12 +44,8 @@ startSshClientandDaemon()
   (
     # Start SSH daemon on demand
     start-stop-daemon -S -x $SSH_DAEMON -m -b -p /var/tmp/rsshd.pid -- -B -F
+    DROPBEAR_PASSWORD="$PASSWD" start-stop-daemon -S -x $SSH_CLIENT -m -p /var/tmp/rssh.pid -- $args
 
-    if [ -z "$passwd" ]; then
-      start-stop-daemon -S -x $SSH_CLIENT -m -p /var/tmp/rssh.pid -- $args
-    else
-      DROPBEAR_PASSWORD="$passwd" start-stop-daemon -S -x $SSH_CLIENT -m -p /var/tmp/rssh.pid -- $args
-    fi
     $STARTUNNELSH stop
   )
 }
@@ -89,11 +85,6 @@ case $oper in
                 $STARTUNNELSH stop
 
                 args=`echo $*`
-                if [[ "$*" =~ "passwd=" ]]; then
-                    # Assumption: host password is the first argument
-                    passwd="$(awk '{print $1}'<<<$args | cut -d '=' -f2)"
-                    args="$(awk '{$1 = ""; print $0;}' <<<$args)" # Update SSH args to exclude login password
-                fi
 
                 startSshClientandDaemon &
                 exit 1
