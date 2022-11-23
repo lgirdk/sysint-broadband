@@ -23,6 +23,7 @@
 . /etc/device.properties
 
 source /etc/waninfo.sh
+source /lib/rdk/t2Shared_api.sh
 
 if [ -f /lib/rdk/t2Shared_api.sh ]; then
                 source /lib/rdk/t2Shared_api.sh
@@ -32,6 +33,7 @@ SSH_CLIENT="/usr/bin/dbclient"
 SSH_DAEMON="/usr/sbin/dropbear"
 WAN_INTERFACE=$(getWanInterfaceName)
 STARTUNNELSH=$0
+MARKER="EVT_SYS_SH_RSSH_split"
 
 usage()
 {
@@ -46,6 +48,7 @@ startSshClientandDaemon()
 
   flock "$fd"
   (
+    t2ValNotify "$MARKER" "RSSH Service Started"
     # Start SSH daemon on demand
     start-stop-daemon -S -x $SSH_DAEMON -m -b -p /var/tmp/rsshd.pid -- -B -F
     DROPBEAR_PASSWORD="$PASSWD" start-stop-daemon -S -x $SSH_CLIENT -m -p /var/tmp/rssh.pid -- $args
@@ -200,10 +203,15 @@ case $oper in
                  if [ -f /var/tmp/rssh.pid ];then
                      start-stop-daemon -K -p /var/tmp/rssh.pid
                      rm /var/tmp/rssh.pid
+                     sendEvent=1
                  fi
                  if [ -f /var/tmp/rsshd.pid ];then
                      start-stop-daemon -K -p /var/tmp/rsshd.pid
                      rm /var/tmp/rsshd.pid
+                     sendEvent=1
+                 fi
+                 if [ $sendEvent -eq 1 ];then
+                     t2ValNotify "$MARKER" "RSSH Service Stopped"
                  fi
                  exit 1
              fi
