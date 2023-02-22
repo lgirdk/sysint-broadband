@@ -46,7 +46,7 @@ startSshClientandDaemon()
   (
     t2ValNotify "$MARKER" "RSSH Service Started"
     # Start SSH daemon on demand
-    start-stop-daemon -S -x $SSH_DAEMON -m -b -p /var/tmp/rsshd.pid -- -B -F
+    start-stop-daemon -S -x $SSH_DAEMON -m -b -p /var/tmp/rsshd.pid -- -B -F -p 127.0.0.1:22
     DROPBEAR_PASSWORD="$PASSWD" start-stop-daemon -S -x $SSH_CLIENT -m -p /var/tmp/rssh.pid -- $args
 
     $STARTUNNELSH stop
