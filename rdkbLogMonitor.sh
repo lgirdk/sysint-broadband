@@ -214,29 +214,18 @@ SERVER=`getTFTPServer $BUILD_TYPE`
 
 get_logbackup_cfg()
 {
-default_logbackup_enable="true"
-backupenable=`syscfg get logbackup_enable`
-backupenable_err=`echo $backupenable | grep "error" -i`
-if [ "$backupenable_err" != "" ]
-then
-	backupenable=$default_logbackup_enable
-fi
+	if [ "$NVRAM2_SUPPORTED" = "yes" ]
+	then
+		backupenable=$(syscfg get logbackup_enable)
 
-#isNvram2Supported="no"
-#if [ -f /etc/device.properties ]
-#then
-#   isNvram2Supported=`cat /etc/device.properties | grep NVRAM2_SUPPORTED | cut -f2 -d=`
-#	
-#fi
-
-if [ "$NVRAM2_SUPPORTED" = "yes" ] && [ "$backupenable" = "true" ]
-then
-	LOGBACKUP_ENABLE="true"
-else
-	LOGBACKUP_ENABLE="false"
-fi
-	LOGBACKUP_INTERVAL=`syscfg get logbackup_interval`
-
+		if [ "$backupenable" = "true" ] || [ -n "$(echo $backupenable | grep -i 'error')" ]
+		then
+			LOGBACKUP_ENABLE="true"
+			LOGBACKUP_INTERVAL=$(syscfg get logbackup_interval)
+		else
+			LOGBACKUP_ENABLE="false"
+		fi
+	fi
 }
 
 upload_nvram2_logs()
