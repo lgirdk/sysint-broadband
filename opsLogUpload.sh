@@ -75,10 +75,10 @@ then
       echo_t "opslogupload: getMtlsCreds failed for sky-uk. Exiting"
       exit
    else
-      echo_t "opslogupload: getMtlsCreds returned $CERT"
+      echo_t "opslogupload: getMtlsCreds returned success"
    fi
 else
-   echo_t "opslogupload: getMtlsCreds returned $CERT"
+   echo_t "opslogupload: getMtlsCreds returned"
    mTlsLogUpload=`syscfg get mTlsLogUpload_Enable`
 fi
 

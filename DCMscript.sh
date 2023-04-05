@@ -163,10 +163,10 @@ then
        echo_t "DCMscript getMtlsCreds failed for sky-uk. Exiting"
        exit
     else
-       echo_t "DCMscript getMtlsCreds returned $CERT"
+       echo_t "DCMscript getMtlsCreds returned success"
     fi
 else
-   echo_t "DCMscript getMtlsCreds returned $CERT"
+   echo_t "DCMscript getMtlsCreds returned"
 fi
 
 sshCmdOnAtom() {

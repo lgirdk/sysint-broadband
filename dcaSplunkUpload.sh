@@ -242,10 +242,10 @@ useDirectRequest()
            echo_t "dca: getMtlsCreds failed for sky-uk. Exiting" >> $RTL_LOG_FILE
            exit
         else
-           echo_t "dca : getMtlsCreds returned $CERTOPTION" >> $RTL_LOG_FILE
+           echo_t "dca : getMtlsCreds returned success" >> $RTL_LOG_FILE
         fi
     else
-       echo_t "dca : getMtlsCreds returned $CERTOPTION" >> $RTL_LOG_FILE
+       echo_t "dca : getMtlsCreds returned" >> $RTL_LOG_FILE
     fi
     if [ -f /etc/waninfo.sh ]; then
         EROUTER_INTERFACE=$(getWanInterfaceName)

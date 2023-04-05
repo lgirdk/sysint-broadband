@@ -154,10 +154,10 @@ then
       echo_t "logupload: getMtlsCreds failed for sky-uk. Exiting"
       exit
    else
-      echo_t "logupload: getMtlsCreds returned $CERT"
+      echo_t "logupload: getMtlsCreds returned success"
    fi
 else
-   echo_t "logupload: getMtlsCreds returned $CERT"
+   echo_t "logupload: getMtlsCreds returned"
    mTlsLogUpload=`syscfg get mTlsLogUpload_Enable`
 fi
 
