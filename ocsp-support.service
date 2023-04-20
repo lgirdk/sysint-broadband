@@ -28,7 +28,6 @@ Type=oneshot
 ExecStart=/bin/sh -c '/lib/rdk/ocsp-support.sh'
 RemainAfterExit=yes
 
-StandardOutput=syslog+console
 
 [Install]
 WantedBy=multi-user.target
