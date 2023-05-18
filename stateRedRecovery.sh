@@ -12,4 +12,4 @@ else
     FIRMWARE_DOWNLOAD='_firmwareDwnld.sh'
     SCRIPT_NAME="$BOX$FIRMWARE_DOWNLOAD"
 fi
-sh /etc/$SCRIPT_NAME 6 >> /rdklogs/logs/xconf.txt.0 2>&1
+sh /etc/$SCRIPT_NAME 6 2>&1
