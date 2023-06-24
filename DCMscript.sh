@@ -482,8 +482,12 @@ sendHttpRequestToServer()
     fi
     partnerId=$(getPartnerId)
     accountId=$(getAccountId)
-    JSONSTR='estbMacAddress='$(getErouterMacAddress)'&firmwareVersion='$(getFWVersion)'&env='$(getBuildType)'&model='$(getModel)'&partnerId='${partnerId}'&accountId='${accountId}'&ecmMacAddress='$(getMacAddress)'&controllerId='$(getControllerId)'&channelMapId='$(getChannelMapId)'&vodId='$(getVODId)'&version=2'
-
+    if [ $MODEL_NUM = "WNXL11BWL" ]; then
+        erouterMac=`cat /sys/class/net/eth0/address | tr '[a-f]' '[A-F]' `
+        JSONSTR='estbMacAddress='$erouterMac'&firmwaerouterMacreVersion='$(getFWVersion)'&env='$(getBuildType)'&model='$(getModel)'&partnerId='${partnerId}'&accountId='${accountId}'&ecmMacAddress='$erouterMac'&controllerId='$(getControllerId)'&channelMapId='$(getChannelMapId)'&vodId='$(getVODId)'&version=2'
+    else
+        JSONSTR='estbMacAddress='$(getErouterMacAddress)'&firmwareVersion='$(getFWVersion)'&env='$(getBuildType)'&model='$(getModel)'&partnerId='${partnerId}'&accountId='${accountId}'&ecmMacAddress='$(getMacAddress)'&controllerId='$(getControllerId)'&channelMapId='$(getChannelMapId)'&vodId='$(getVODId)'&version=2'
+    fi
     last_char=`echo $URL | awk '$0=$NF' FS=`
     if [ "$last_char" != "?" ]; then
         URL="$URL?"
