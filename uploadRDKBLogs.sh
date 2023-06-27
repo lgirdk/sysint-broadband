@@ -33,12 +33,9 @@ NVRAM2_SUPPORTED="no"
 . /lib/rdk/utils.sh 
 . $RDK_LOGGER_PATH/logfiles.sh
 
-CERT=""
-if [ -f /lib/rdk/mtlsUtils.sh ]
+if [ -f /lib/rdk/exec_curl_mtls.sh ]
 then
-   source /lib/rdk/mtlsUtils.sh
-   echo_t "uploadRDKBLogs.sh: calling getMtlsCreds"
-   CERT="`getMtlsCreds uploadRDKBLogs.sh`"
+   source /lib/rdk/exec_curl_mtls.sh
 fi
 
 if [ $# -lt 4 ]; then 
@@ -148,16 +145,8 @@ fi
 if [ "$partnerId" = "sky-uk" ]
 then
    mTlsLogUpload=true
-   echo_t "logupload: Check MTLS only for partner sky-uk"
-   if [ "$CERT" = "" ]
-   then
-      echo_t "logupload: getMtlsCreds failed for sky-uk. Exiting"
-      exit
-   else
-      echo_t "logupload: getMtlsCreds returned success"
-   fi
+   echo_t "logupload: MTLS LogUpload Enabled for partner sky-uk"
 else
-   echo_t "logupload: getMtlsCreds returned"
    mTlsLogUpload=`syscfg get mTlsLogUpload_Enable`
 fi
 
@@ -168,31 +157,6 @@ XPKI_MTLS_MAX_TRIES=0
 xpkiMtlsRFC=`syscfg get UseXPKI_Enable`
 encryptionEnable=`dmcli eRT getv Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.EncryptCloudUpload.Enable | grep value | cut -d ":" -f 3 | tr -d ' '`
 URLENCODE_STRING=""
-
-checkXpkiMtlsBasedLogUpload()
-{
-    if [ "x$xpkiMtlsRFC" = "xtrue" ] && [ -f /usr/bin/rdkssacli ] && [ -f /nvram/certs/devicecert_1.pk12 ]; then
-        useXpkiMtlsLogupload="true"
-        XPKI_MTLS_MAX_TRIES=2
-    else
-        useXpkiMtlsLogupload="false"
-        XPKI_MTLS_MAX_TRIES=0
-    fi
-}
-
-checkStaticXpkiMtlsBasedLogUpload()
-{
-    if [ "x$mTlsLogUpload" = "xtrue" ] && [ -f /etc/ssl/certs/staticXpkiCrt.pk12 ] && [ -x /usr/bin/GetConfigFile ]; then
-        ID="/tmp/.cfgStaticxpki"
-        GetConfigFile $ID
-        if [ ! -f "$ID" ]; then
-            echo_t "Getconfig file fails , use standard TLS"
-            useStaticXpkiMtlsLogupload="false"
-        else
-            useStaticXpkiMtlsLogupload="true"
-        fi
-    fi
-}
 
 CURL_BIN="curl"
 
@@ -363,48 +327,41 @@ useDirectRequest()
     # Direct Communication
     # Performing DIRECT_MAX_ATTEMPTS tries for successful curl command execution.
     # $http_code --> Response code retrieved from HTTP_CODE file path.
-    echo_t "Trying Direct Communication"
-    retries=0
-
-    checkXpkiMtlsBasedLogUpload
-    checkStaticXpkiMtlsBasedLogUpload
-
-    while [ "$retries" -lt "$DIRECT_MAX_ATTEMPTS" ]
-    do
-        WAN_INTERFACE=$(getWanInterfaceName)
-        echo_t "Trial $retries for DIRECT ..."
-        # nice value can be normal as the first trial failed
-        msg_tls_source="TLS"
-        CURL_CMD="$CURL_BIN $CERT --tlsv1.2 -w '%{http_code}\n' -d \"filename=$UploadFile\" $URLENCODE_STRING -o \"$OutputFile\" --interface $WAN_INTERFACE $addr_type \"$S3_URL\" $CERT_STATUS --connect-timeout 30 -m 30"
-
-        if [[ ! -e $UploadFile ]]; then
-          echo_t "No file exist or already uploaded!!!"
-          http_code=-1
-          break;
-        fi
-        echo_t "CURL_CMD: `echo "$CURL_CMD" | sed -e 's#devicecert_1.*-w#devicecert_1.pk12<hidden key> -w#g' -e 's#AWSAccessKeyId=.*Signature=.*&#<hidden key>#g' | sed -e 's#staticXpkiCrt.*-w#staticXpkiCrt.pk12<hidden key> -w#g'`"
-        HTTP_CODE=`ret= eval $CURL_CMD`
-        if [ "x$HTTP_CODE" != "x" ]; then
-            http_code=$(echo "$HTTP_CODE" | awk '{print $0}' )
-            echo_t "Log Upload: $msg_tls_source Direct Communication - ret:$ret, http_code:$http_code"
-            if [ "$http_code" != "" ];then
-                echo_t "Log Upload: $msg_tls_source Direct connection HttpCode received is : $http_code"
-                if [ "$http_code" = "200" ] || [ "$http_code" = "302" ] ;then
-                    rm -f "$ID"
-                    return 0
-                fi
+    if [ "x$mTlsLogUpload" == "xtrue" ] ; then
+        retries=0
+        while [ "$retries" -lt "$DIRECT_MAX_ATTEMPTS" ]
+        do
+            echo_t "Trying Direct Communication"
+            WAN_INTERFACE=$(getWanInterfaceName)
+            echo_t "Trial $retries for DIRECT ..."
+            msg_tls_source="TLS"
+            CURL_ARGS="--tlsv1.2 -w '%{http_code}\n' -d \"filename=$UploadFile\" $URLENCODE_STRING -o \"$OutputFile\" --interface $WAN_INTERFACE $addr_type \"$S3_URL\" $CERT_STATUS --connect-timeout 30 -m 30"
+            if [[ ! -e $UploadFile ]]; then
+                echo_t "No file exist or already uploaded!!!"
+                http_code=-1
+                break;
             fi
-        else
-            http_code=0
-            echo_t "Log Upload: $msg_tls_source Direct Communication Failure Attempt:$retries - ret:$ret, http_code:$http_code"
-        fi
-               
-        retries=`expr $retries + 1`
-        random_sleep $retries
-    done
-    rm -f "$ID"
-    echo_t "Retries for Direct connection exceeded " 
-    return 1
+            ret=` exec_curl_mtls "$CURL_ARGS"`
+            if [ -f $HTTP_CODE ] ; then
+               http_code=$(awk '{print $1}' $HTTP_CODE)
+               if [ "$http_code" != "" ];then
+                   echo_t "Log Upload: $msg_tls_source Direct Communication - ret:$ret, http_code:$http_code"
+                   if [ "$http_code" = "200" ] || [ "$http_code" = "302" ] ;then
+                        return 0
+                   fi
+               fi
+            else
+               http_code=0
+               echo_t "Log Upload: $msg_tls_source Direct Communication Failure Attempt:$retries - ret:$ret, http_code:$http_code"
+            fi
+            retries=`expr $retries + 1`
+            random_sleep $retries
+        done
+        echo_t "Retries for Direct connection exceeded "
+    else
+        echo_t "mTlsLogUpload is disabled"
+    fi
+return 1
 }
 
 # Codebig connection Download function        

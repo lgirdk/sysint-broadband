@@ -61,12 +61,19 @@ if [ ! -f /usr/bin/GetConfigFile ];then
 fi
 
 partnerId="$(getPartnerId)"
-CERTOPTION=""
 
-if [ -f $RDK_PATH/mtlsUtils.sh ]; then
-     . $RDK_PATH/mtlsUtils.sh
-     echo_t "dcaSplunkUpload.sh: calling getMtlsCreds" >> $RTL_LOG_FILE
-     CERTOPTION="`getMtlsCreds dcaSplunkUpload.sh /etc/ssl/certs/dcm-cpe-clnt.xcal.tv.cert.pem /tmp/geyoxnweddys`"
+if [ "$DEVICE_TYPE" = "broadband" ] ; then
+   if [ -f $RDK_PATH/exec_curl_mtls.sh ]; then
+      . $RDK_PATH/exec_curl_mtls.sh
+   fi
+else
+   CERTOPTION=""
+
+   if [ -f $RDK_PATH/mtlsUtils.sh ]; then
+       . $RDK_PATH/mtlsUtils.sh
+       echo_t "dcaSplunkUpload.sh: calling getMtlsCreds" >> $RTL_LOG_FILE
+       CERTOPTION="`getMtlsCreds dcaSplunkUpload.sh /etc/ssl/certs/dcm-cpe-clnt.xcal.tv.cert.pem /tmp/geyoxnweddys`"
+   fi
 fi
 
 SIGN_FILE="/tmp/.signedRequest_$$_`date +'%s'`"
@@ -87,7 +94,7 @@ fi
 # Max backlog queue set to 5, after which the resend file will discard subsequent entries
 MAX_CONN_QUEUE=5
 DIRECT_RETRY_COUNT=2
-
+HTTP_CODE=/tmp/.dca-splunk_httpcode
 ignoreResendList="false"
 
 # exit if an instance is already running
@@ -233,31 +240,22 @@ useDirectRequest()
     echo_t "dca$2: Using Direct commnication"
     echo_t "dca: Log Upload requires MTLS Authentication" >> $RTL_LOG_FILE
        
-    #Partner sky-uk should impose MTLS only connection
-    if [ "$DEVICE_TYPE" = "broadband" ] && [ "$partnerId" = "sky-uk" ]
-    then
-        echo_t "dca: Check MTLS only for partner sky-uk" >>  $RTL_LOG_FILE
-        if [ "$CERTOPTION" = "" ]
-        then
-           echo_t "dca: getMtlsCreds failed for sky-uk. Exiting" >> $RTL_LOG_FILE
-           exit
-        else
-           echo_t "dca : getMtlsCreds returned success" >> $RTL_LOG_FILE
-        fi
-    else
-       echo_t "dca : getMtlsCreds returned" >> $RTL_LOG_FILE
-    fi
     if [ -f /etc/waninfo.sh ]; then
         EROUTER_INTERFACE=$(getWanInterfaceName)
     fi
-    CURL_CMD="curl -s $TLS $CERTOPTION -w '%{http_code}\n' --interface $EROUTER_INTERFACE $addr_type -H \"Accept: application/json\" -H \"Content-type: application/json\" -X POST -d '$1' -o \"$HTTP_FILENAME\" \"$DCA_UPLOAD_URL\" $CERT_STATUS --connect-timeout $CURL_TIMEOUT -m $CURL_TIMEOUT"
-    HTTP_CODE=`curl -s $TLS $CERTOPTION -w '%{http_code}\n' --interface $EROUTER_INTERFACE $addr_type -H "Accept: application/json" -H "Content-type: application/json" -X POST -d "$1" -o "$HTTP_FILENAME" "$DCA_UPLOAD_URL" $CERT_STATUS --connect-timeout $CURL_TIMEOUT -m $CURL_TIMEOUT`
-    ret=$?
-    CURL_CMD=`echo "$CURL_CMD" | sed 's/devicecert_1.*-w/devicecert_1.pk12<hidden key>/' | sed 's/staticXpkiCr.*-w/staticXpkiCrt.pk12<hidden key>/'`
-    echo_t "CURL_CMD: $CURL_CMD" >> $RTL_LOG_FILE
-    
-    http_code=$(echo "$HTTP_CODE" | awk -F\" '{print $1}' )
-    [ "x$http_code" != "x" ] || http_code=0
+    CURL_ARGS="-s $TLS -w '%{http_code}\n' --interface $EROUTER_INTERFACE $addr_type -H \"Accept: application/json\" -H \"Content-type: application/json\" -X POST -d '$1' -o \"$HTTP_FILENAME\" \"$DCA_UPLOAD_URL\" $CERT_STATUS --connect-timeout $CURL_TIMEOUT -m $CURL_TIMEOUT"
+    if [ "$DEVICE_TYPE" = "broadband" ]; then
+	ret=` exec_curl_mtls "$CURL_ARGS"`
+    else
+	CURL_CMD="curl $CERTOPTION $CURL_ARGS"
+	result=` eval $CURL_CMD > $HTTP_CODE`
+        ret=$?
+        CURL_CMD=`echo "$CURL_CMD" | sed 's/devicecert_1.*-w/devicecert_1.pk12<hidden key>/' | sed 's/staticXpkiCr.*-w/staticXpkiCrt.pk12<hidden key>/'`
+        echo_t "CURL_CMD: $CURL_CMD" >> $RTL_LOG_FILE
+    fi
+    if [ -f $HTTP_CODE ]; then
+        http_code=$(awk -F\" '{print $1}' $HTTP_CODE)
+    fi
 
     rm -f $HTTP_FILENAME
 

@@ -35,11 +35,17 @@ source /lib/rdk/getpartnerid.sh
 source /lib/rdk/getaccountid.sh
 source /lib/rdk/t2Shared_api.sh
 
-CERT=""
-if [ -f $RDK_PATH/mtlsUtils.sh ]; then
-     . $RDK_PATH/mtlsUtils.sh
-     echo_t "DCMscript.sh calling getMtlsCreds"
-     CERT="`getMtlsCreds DCMscript.sh`"
+if [ "$DEVICE_TYPE" = "broadband" ] ; then
+    if [ -f $RDK_PATH/exec_curl_mtls.sh ]; then
+        source $RDK_PATH/exec_curl_mtls.sh
+    fi
+else
+    CERT=""
+    if [ -f $RDK_PATH/mtlsUtils.sh ]; then
+       . $RDK_PATH/mtlsUtils.sh
+        echo_t "DCMscript.sh calling getMtlsCreds"
+        CERT="`getMtlsCreds DCMscript.sh`"
+    fi
 fi
 
 # Enable override only for non prod builds
@@ -110,6 +116,7 @@ IDLE_TIMEOUT=30
 
 # http header
 HTTP_HEADERS='Content-Type: application/json'
+HTTP_CODE=/tmp/.dcm_http_code
 ## RETRY DELAY in secs
 RETRY_DELAY=60
 MAX_SSH_RETRY=3
@@ -153,21 +160,6 @@ rm -f $TELEMETRY_TEMP_RESEND_FILE
 conn_str="Direct"
 CodebigAvailable=0
 UseCodeBig=0
-
-#Partner sky-uk should impose MTLS only connection
-if [ "$DEVICE_TYPE" = "broadband" ] && [ "$partnerId" = "sky-uk" ]
-then
-   echo_t "Check MTLS only for partner sky-uk"
-   if [ "$CERT" = "" ]
-   then
-       echo_t "DCMscript getMtlsCreds failed for sky-uk. Exiting"
-       exit
-    else
-       echo_t "DCMscript getMtlsCreds returned success"
-    fi
-else
-   echo_t "DCMscript getMtlsCreds returned"
-fi
 
 sshCmdOnAtom() {
 
@@ -317,14 +309,18 @@ useDirectRequest()
        if [ -f /etc/waninfo.sh ]; then
            EROUTER_INTERFACE=$(getWanInterfaceName)
        fi
-       CURL_CMD="curl $CERT -w '%{http_code}\n' --tlsv1.2 --interface $EROUTER_INTERFACE $addr_type $CERT_STATUS --connect-timeout $timeout -m $timeout -o  \"$tmpHttpResponse\" '$HTTPS_URL$JSONSTR'"
-       HTTP_CODE=`result= eval $CURL_CMD`
-       ret=$?
-       CURL_CMD=`echo "$CURL_CMD" | sed 's/devicecert_1.* /devicecert_1.pk12<hidden key>/' | sed 's/staticXpkiCr.* /staticXpkiCrt.pk12<hidden key>/'`
-       echo_t "CURL_CMD: $CURL_CMD" >> $DCM_LOG_FILE
-
+       CURL_ARGS="-w '%{http_code}\n' --tlsv1.2 --interface $EROUTER_INTERFACE $addr_type $CERT_STATUS --connect-timeout $timeout -m $timeout -o  \"$tmpHttpResponse\" '$HTTPS_URL$JSONSTR'"
+       if [ "$DEVICE_TYPE" = "broadband" ] ; then
+            ret=` exec_curl_mtls "$CURL_ARGS"`
+       else
+            CURL_CMD=" curl $CERT $CURL_ARGS"
+            result=` eval $CURL_CMD > $HTTP_CODE`
+            ret=$?
+            CURL_CMD=`echo "$CURL_CMD" | sed 's/devicecert_1.* /devicecert_1.pk12<hidden key>/' | sed 's/staticXpkiCr.* /staticXpkiCrt.pk12<hidden key>/'`
+            echo_t "CURL_CMD: $CURL_CMD" >> $DCM_LOG_FILE
+       fi
        sleep 2
-       http_code=$(echo "$HTTP_CODE" | awk -F\" '{print $1}' )
+       http_code=$(awk '{print $1}' $HTTP_CODE)
        [ "x$http_code" != "x" ] || http_code=0
        echo_t "ret = $ret http_code: $http_code" >> $DCM_LOG_FILE
 
