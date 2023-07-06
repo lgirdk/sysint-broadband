@@ -101,11 +101,20 @@ getStateRedXconfUrl()
     stateredRecoveryURL=""
     tmp_URL="$(dmcli eRT getv Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Control.XconfRecoveryUrl | grep string | cut -d":" -f3- | cut -d" " -f2- | tr -d ' ')"
     if [ "$tmp_URL" != "" ];then
-        stateRedlog "XCONF SCRIPT : Setting stateredRecoveryURL : $tmp_URL"
-        stateredRecoveryURL="${tmp_URL}"
+	if [ "$direct_CDN" = "true" ];then
+            tmp_URL=$(echo "$tmp_URL" | sed 's/swu/firmware/')
+            stateredRecoveryURL="${tmp_URL}"
+	else
+            stateRedlog "XCONF SCRIPT : Setting stateredRecoveryURL : $tmp_URL"
+            stateredRecoveryURL="${tmp_URL}"
+        fi
     else
-        stateRedlog "XCONF SCRIPT : Setting default stateredRecoveryURL"
-        stateredRecoveryURL="https://recovery.xconfds.coast.xcal.tv/xconf/swu/stb"
+	if [ "$direct_CDN" = "true" ];then
+	    stateredRecoveryURL="https://recovery.xconfds.coast.xcal.tv/xconf/firmware/stb"
+	else
+            stateRedlog "XCONF SCRIPT : Setting default stateredRecoveryURL"
+            stateredRecoveryURL="https://recovery.xconfds.coast.xcal.tv/xconf/swu/stb"
+        fi
     fi
     echo "$stateredRecoveryURL"
 }
