@@ -118,12 +118,6 @@ fi
 
 echo "\$SERVER[\"socket\"] == \"brlan0:443\" { server.use-ipv6 = \"enable\" ssl.engine = \"enable\" ssl.pemfile = \"/etc/server.pem\" }" >> $LIGHTTPD_CONF
 
-#If video analytics test is enabled in device.properties file, open 58081 securely.
-if [ "$VIDEO_ANALYTICS" = "enabled" ]
-then
-    echo "\$SERVER[\"socket\"] == \"brlan0:58081\" { server.use-ipv6 = \"enable\" server.document-root = \"/usr/video_analytics\" ssl.engine = \"enable\" ssl.verifyclient.activate = \"enable\" ssl.ca-file = \"/etc/webui/certs/comcast-rdk-ca-chain.cert.pem\" ssl.pemfile = \"/tmp/.webui/rdkb-video.pem\" }" >> $LIGHTTPD_CONF
-fi
-
 echo "\$SERVER[\"socket\"] == \"$INTERFACE:443\" { server.use-ipv6 = \"enable\" ssl.engine = \"enable\" ssl.pemfile = \"/etc/server.pem\" }" >> $LIGHTTPD_CONF
 echo "\$SERVER[\"socket\"] == \"wan0:443\" { server.use-ipv6 = \"enable\" ssl.engine = \"enable\" ssl.pemfile = \"/etc/server.pem\" }" >> $LIGHTTPD_CONF
 if [ $HTTPS_PORT -ne 0 ]
@@ -350,23 +344,6 @@ then
     fi
 fi		
 
-if [ "$VIDEO_ANALYTICS" = "enabled" ]
-then
-    if [ -d /etc/webui/certs ]; then
-        if [ ! -f /usr/bin/GetConfigFile ];then
-            echo "Error: GetConfigFile Not Found"
-            exit 127
-        fi
-        mkdir -p /tmp/.webui/
-        ID="/tmp/.webui/rdkb-video.pem"
-        cp /etc/webui/certs/comcast-rdk-ca-chain.cert.pem /tmp/.webui/
-        GetConfigFile $ID
-        if [ -f /tmp/.webui/rdkb-video.pem ]; then
-            chmod 600 /tmp/.webui/rdkb-video.pem
-        fi
-    fi
-fi
-
 #echo "\$SERVER[\"socket\"] == \"$INTERFACE:10443\" { server.use-ipv6 = \"enable\" ssl.engine = \"enable\" ssl.pemfile = \"/etc/server.pem\" server.document-root = \"/fss/gw/usr/walled_garden/parcon/siteblk\" server.error-handler-404 = \"/index.php\" }" >> /var/lighttpd.conf
 #echo "\$SERVER[\"socket\"] == \"$INTERFACE:18080\" { server.use-ipv6 = \"enable\"  server.document-root = \"/fss/gw/usr/walled_garden/parcon/siteblk\" server.error-handler-404 = \"/index.php\" }" >> /var/lighttpd.conf
 
@@ -378,10 +355,6 @@ then
 fi
 
 LD_LIBRARY_PATH=/fss/gw/usr/ccsp:$LD_LIBRARY_PATH lighttpd -f $LIGHTTPD_CONF
-
-if [ -f /tmp/.webui/rdkb-video.pem ]; then
-       rm -rf /tmp/.webui/rdkb-video.pem
-fi
 
 echo_t "WEBGUI : Set event"
 sysevent set webserver started
