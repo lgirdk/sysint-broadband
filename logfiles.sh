@@ -71,6 +71,8 @@ FLUSH_LOG_PATH="/rdklogger/flush_logs.sh"
 SYS_CFG_FILE="syscfg.db"
 BBHM_CFG_FILE="bbhm_cur_cfg.xml"
 WIRELESS_CFG_FILE="wireless"
+SE05x_rdk_logs="se05x_daemon.log"
+SE05x_tmp_logs="/tmp/rdkssa.txt"
 
 if [ "$BOX_TYPE" = "XB3" ]; then
 SYS_DB_FILE="/nvram/syscfg.db"
@@ -587,6 +589,9 @@ backupnvram2logs()
 
 	cd $destn
 	cp /version.txt $LOG_SYNC_PATH
+        if [ "$MODEL_NUM" = "CGM4981COM" ]; then
+              cp $SE05x_tmp_logs $LOG_SYNC_PATH$SE05x_rdk_logs
+        fi
 
         if [ "$BOX_TYPE" = "XB6" ]; then
         	cp $SYS_DB_FILE $LOG_SYNC_PATH$SYS_CFG_FILE
@@ -690,6 +695,9 @@ backupnvram2logs_on_reboot()
 
 	cd $destn
 	cp /version.txt $LOG_SYNC_PATH
+        if [ "$MODEL_NUM" = "CGM4981COM" ]; then
+              cp $SE05x_tmp_logs $TarFolder$SE05x_rdk_logs
+        fi
 
          if [ "$BOX_TYPE" = "XB6" ]; then
         	cp $SYS_DB_FILE $TarFolder$SYS_CFG_FILE
@@ -821,7 +829,9 @@ backupAllLogs()
 		$operation $source$fname $dt; >$source$fname;
 	done
 	cp /version.txt $dt
-
+        if [ "$MODEL_NUM" = "CGM4981COM" ]; then
+              cp $SE05x_tmp_logs $dt$SE05x_rdk_logs
+        fi
 	if [ "$BOX_TYPE" = "XB6" ]; then
 		cp $SYS_DB_FILE $dt$SYS_CFG_FILE
         cp /nvram/$BBHM_CFG_FILE $dt$BBHM_CFG_FILE

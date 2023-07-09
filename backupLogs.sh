@@ -27,6 +27,8 @@ source $RDK_LOGGER_PATH/logUpload_default_params.sh
 
 LOG_UPLOAD_PID="/tmp/.log_upload.pid"
 REBOOT_PENDING_DELAY=2
+SE05x_rdk_logs="se05x_daemon.log"
+SE05x_tmp_logs="/tmp/rdkssa.txt"
 
 IHC_Enable="`syscfg get IHC_Mode`"
 #starting the IHC now
@@ -180,6 +182,9 @@ backupLogsonReboot()
 	#fi
 	cd $LOG_BACK_UP_REBOOT
 	cp /version.txt $LOG_BACK_UP_REBOOT$dt
+	if [ "$MODEL_NUM" = "CGM4981COM" ]; then
+	      cp $SE05x_tmp_logs $LOG_BACK_UP_REBOOT$dt$SE05x_rdk_logs
+	fi
 
 	if [ "$ATOM_SYNC" = "yes" ]
 	then
@@ -288,6 +293,9 @@ backupLogsonReboot_nvram2()
 
 	cd $LOG_SYNC_BACK_UP_REBOOT_PATH
         cp /version.txt $LOG_SYNC_PATH
+	if [ "$MODEL_NUM" = "CGM4981COM" ]; then
+	      cp $SE05x_tmp_logs $LOG_SYNC_PATH$SE05x_rdk_logs
+	fi
 
 	#echo "*.tgz" > $PATTERN_FILE # .tgz should be excluded while tar
 	#tar -X $PATTERN_FILE -cvzf $MAC"_Logs_$dt.tgz" $LOG_SYNC_PATH
