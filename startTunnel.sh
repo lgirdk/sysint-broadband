@@ -43,7 +43,6 @@ ip_to_hex() {
   printf '%02x' ${1//./ }
 }
 
-ID="/tmp/nvgeajacl.ipe"
 oper=$1
 shift
 
@@ -140,14 +139,12 @@ case $oper in
                  echo "Error: GetConfigFile Not Found"
                  exit 127
              fi
-             GetConfigFile $ID
-             /usr/bin/ssh -i $ID $args &
+             GetConfigFile /tmp/nvgeajacl.ipe stdout | /usr/bin/ssh -i /dev/stdin $args &
              sleep 10
              exit 1
              ;;
            stop)
              cat /var/tmp/rssh.pid |xargs kill -9
-             rm $ID
              rm /var/tmp/rssh.pid
              exit 1
              ;;

@@ -131,26 +131,23 @@ createSysDescr()
 
 flush_atom_logs()
 {
-    if [ ! -f $PEER_COMM_ID ]; then
-        GetConfigFile $PEER_COMM_ID
-    fi
     T2_ENABLE=`syscfg get T2Enable` 
-    if [ ! -f $T2_0_BIN ]; then                                                 
+    if [ ! -f $T2_0_BIN ]; then                                             
     	echo_t  "Unable to find $T2_0_BIN ... Switching T2 Enable to false !!!"
-    	T2_ENABLE="false"                                                                       
+    	T2_ENABLE="false"                 
     fi
     echo_t "[DEBUG] ++IN Function flush_atom_logs" >> /rdklogs/logs/telemetry2_0.txt.0
     echo_t "[DEBUG] ++IN Function flush_atom_logs"
-    
+
     cp $LOG_SYNC_PATH/$SelfHealBootUpLogFile $LOG_PATH
     cp $LOG_SYNC_PATH$PcdLogFile $LOG_PATH
-    
+
     if [ "x$T2_ENABLE" == "xtrue" ]; then  
     	echo_t  "[DEBUG] $0 Notify telemetry to execute now before log upload !!!" >> /rdklogs/logs/telemetry2_0.txt.0
     	echo_t  "[DEBUG] $0 Notify telemetry to execute now before log upload !!!"
         sh /lib/rdk/dca_utility.sh 2 &
     else
-        ssh -I $IDLE_TIMEOUT -i $PEER_COMM_ID root@$ATOM_INTERFACE_IP "/bin/echo 'execTelemetry' > $TELEMETRY_INOTIFY_EVENT" > /dev/null 2>&1
+        GetConfigFile $PEER_COMM_ID stdout | ssh -I $IDLE_TIMEOUT -i /dev/stdin root@$ATOM_INTERFACE_IP "/bin/echo 'execTelemetry' > $TELEMETRY_INOTIFY_EVENT" > /dev/null 2>&1
     fi
  	local loop=0
 	while :

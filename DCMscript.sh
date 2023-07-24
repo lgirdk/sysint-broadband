@@ -164,16 +164,13 @@ UseCodeBig=0
 sshCmdOnAtom() {
 
     command=$1
-    if [ ! -f $PEER_COMM_ID ]; then
-        GetConfigFile $PEER_COMM_ID
-    fi
 
     count=0
     isCmdExecFail="true"
     while [ $count -lt $MAX_SSH_RETRY ]
     do
 
-        ssh -I $IDLE_TIMEOUT -i $PEER_COMM_ID root@$ATOM_INTERFACE_IP "echo $command > $TELEMETRY_INOTIFY_EVENT"  > /dev/null 2>&1
+        GetConfigFile $PEER_COMM_ID stdout | ssh -I $IDLE_TIMEOUT -i /dev/stdin root@$ATOM_INTERFACE_IP "echo $command > $TELEMETRY_INOTIFY_EVENT"  > /dev/null 2>&1
         ret=$?
         if [ $ret -ne 0 ]; then
             echo_t "$count : SSH failure to ATOM for $command.Retrying..." >> $RTL_LOG_FILE
@@ -727,6 +724,7 @@ fi
                 scp -i $PEER_COMM_ID $DCMRESPONSE root@$ATOM_INTERFACE_IP:$PERSISTENT_PATH > /dev/null 2>&1
             fi
             echo "Signal atom to pick the XCONF config data $DCMRESPONSE and schedule telemetry !!! " >> $DCM_LOG_FILE
+            rm -rf $PEER_COMM_ID
             ## Trigger an inotify event on ATOM 
             sshCmdOnAtom 'xconf_update'
         else
