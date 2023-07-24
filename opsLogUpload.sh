@@ -177,8 +177,8 @@ get_Codebigconfig()
 # Direct connection Download function
 useDirectRequest()
 {
-   retries=0
-   if [ "x$mTlsLogUpload" == "xtrue" ] ; then
+     retries=0
+
      while [ "$retries" -lt "$DIRECT_MAX_ATTEMPTS" ]
      do
        WAN_INTERFACE=$(getWanInterfaceName)
@@ -212,9 +212,6 @@ useDirectRequest()
        sleep 30
      done
      echo_t "Retries for Direct connection exceeded "
-   else
-     echo_t "mTlsLogUpload is disabled "
-   fi
 
 return 1
 }

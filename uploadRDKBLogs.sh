@@ -327,7 +327,7 @@ useDirectRequest()
     # Direct Communication
     # Performing DIRECT_MAX_ATTEMPTS tries for successful curl command execution.
     # $http_code --> Response code retrieved from HTTP_CODE file path.
-    if [ "x$mTlsLogUpload" == "xtrue" ] ; then
+
         retries=0
         while [ "$retries" -lt "$DIRECT_MAX_ATTEMPTS" ]
         do
@@ -358,9 +358,6 @@ useDirectRequest()
             random_sleep $retries
         done
         echo_t "Retries for Direct connection exceeded "
-    else
-        echo_t "mTlsLogUpload is disabled"
-    fi
 return 1
 }
 
