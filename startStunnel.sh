@@ -78,11 +78,33 @@ if [ ! -f $CERT_FILE -o ! -f $CA_FILE ]; then
     exit 1
 fi
 
+# Specify cert, CA file and verification method
+DEV_SAN=tstcpedev.xcal.tv
+PROD_SAN=tstcpeprod.xcal.tv
+
 # this might change once we get proper certificates
 echo "cert = $CERT_FILE"                     			      >> $STUNNEL_CONF_FILE
 echo "CAfile = $CA_FILE"                                              >> $STUNNEL_CONF_FILE
 echo "verifyChain = yes"                                              >> $STUNNEL_CONF_FILE
 echo "checkHost = $JUMP_FQDN"                                         >> $STUNNEL_CONF_FILE
+
+DEVICETYPE=$(dmcli eRT getv Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Identity.DeviceType | grep value | cut -d ":" -f 3 | tr -d ' ')
+echo_t "STUNNEL: Device type is $DEVICETYPE"
+if [ ! -z "$DEVICETYPE" ]; then
+    if [ "$DEVICETYPE" == "TEST" ] || [ "$DEVICETYPE" == "test" ];  then
+        echo_t "STUNNEL: Device type is TEST" >> $LOG_FILE
+        t2CountNotify "SHORTS_DEVICE_TYPE_TEST"
+        echo "checkHost   = $DEV_SAN"          >> $STUNNEL_CONF_FILE
+    else
+        echo_t "STUNNEL: Device type is PROD" >> $LOG_FILE
+        t2CountNotify "SHORTS_DEVICE_TYPE_PROD"
+        echo "checkHost   = $PROD_SAN"         >> $STUNNEL_CONF_FILE
+    fi
+else
+    echo_t "STUNNEL: Device type is Unknown" >> $LOG_FILE
+    t2CountNotify "SHORTS_DEVICE_TYPE_UNKNOWN"
+fi
+
 
 if [ -f "/usr/bin/stunnel" ]; then
     /usr/bin/stunnel $STUNNEL_CONF_FILE
