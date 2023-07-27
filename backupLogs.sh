@@ -371,8 +371,10 @@ else
 	else
 		backupLogsonReboot
 	fi	
-        
-	if [ "$BOX_TYPE" = "XF3" ] || [ "$BOX_TYPE" = "TCCBR" ] ; then
+
+#TCCBR-6447: Removed condition for CBR, as the additional files wifi_config_nvram and wifi_config_nvram_bak
+# are making "/data" full, leading to nvram corruption
+	if [ "$BOX_TYPE" = "XF3" ]; then
 		echo "Taking backup of /data/nvram and /data/nvram_bkup " >> "$LOG_SYNC_BACK_UP_PATH"Consolelog.txt.0
 		cp /data/nvram /data/wifi_config_nvram
 		cp /data/nvram_bak /data/wifi_config_nvram_bak
@@ -380,7 +382,7 @@ else
 		nvram show | grep ssid >> "$LOG_SYNC_BACK_UP_PATH"Consolelog.txt.0
 		ls -lh /data/ >> "$LOG_SYNC_BACK_UP_PATH"Consolelog.txt.0
 		
-	fi        
+	fi
 fi
 #sleep 3
 
