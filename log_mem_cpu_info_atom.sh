@@ -87,15 +87,20 @@ TMPFS_THRESHOLD=85
 		totalMemSys=`free | awk 'FNR == 2 {print $2}'`
 		usedMemSys=`free | awk 'FNR == 2 {print $3}'`
 		freeMemSys=`free | awk 'FNR == 2 {print $4}'`
+		availableMemSys=`free | awk 'FNR == 2 {print $7}'`
 
 		echo "RDKB_SYS_MEM_INFO_ATOM : Total memory in system is $totalMemSys at timestamp $timestamp"
 		echo "RDKB_SYS_MEM_INFO_ATOM : Used memory in system is $usedMemSys at timestamp $timestamp"
 		echo "RDKB_SYS_MEM_INFO_ATOM : Free memory in system is $freeMemSys at timestamp $timestamp"
+		echo "RDKB_SYS_MEM_INFO_ATOM : Available memory in system is $availableMemSys at timestamp $timestamp"
 
-	    echo "RDKB_USED_MEM_ATOM : Used mem is $usedMemSys at timestamp $timestamp"
-	    echo "USED_MEM_ATOM:$usedMemSys"
-	    echo "FREE_MEM_ATOM :Free mem is $freeMemSys at timestamp $timestamp"
-            t2ValNotify "USED_MEM_ATOM_split" "$usedMemSys"
+		echo "USED_MEM_ATOM:$usedMemSys"
+		echo "FREE_MEM_ATOM:$freeMemSys"
+		echo "AVAILABLE_MEM_ATOM:$availableMemSys"
+
+		t2ValNotify "USED_MEM_ATOM_split" "$usedMemSys"
+		t2ValNotify "FREE_MEM_ATOM_split" "$freeMemSys"
+		t2ValNotify "AVAILABLE_MEM_ATOM_split" "$availableMemSys"
 
 	    LOAD_AVG=`uptime | awk -F'[a-z]:' '{ print $2}' | sed 's/^ *//g' | sed 's/,//g' | sed 's/ /:/g'`
 	    echo " RDKB_LOAD_AVERAGE_ATOM : Load Average is $LOAD_AVG at timestamp $timestamp"
