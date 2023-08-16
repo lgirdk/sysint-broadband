@@ -135,6 +135,8 @@ STUNNELPID=`cat $STUNNEL_PID_FILE`
 
 if [ -z "$STUNNELPID" ]; then
     rm -f $STUNNEL_PID_FILE
+    rm -f $CA_FILE
+    rm -f $CERT_FILE
     echo_t "STUNNEL: stunnel-client failed to establish. Exiting..." >> $LOG_FILE
     t2CountNotify "SHORTS_STUNNEL_CLIENT_FAILURE"
     exit
