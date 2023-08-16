@@ -18,6 +18,11 @@
 # limitations under the License.
 ##########################################################################
 
+while :
+do
+
+sleep 1h
+
 T2_MSG_CLIENT=/usr/bin/telemetry2_0_client
 
 t2ValNotify() {
@@ -217,4 +222,6 @@ TMPFS_THRESHOLD=85
 else
 	echo "skipping log_mem_cpu_info_atom.sh run" >> /rdklogs/logs/AtomConsolelog.txt.0
 fi
+
+done
 
