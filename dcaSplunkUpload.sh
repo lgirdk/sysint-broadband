@@ -38,7 +38,6 @@ fi
 
 source /etc/log_timestamp.sh
 source /lib/rdk/t2Shared_api.sh
-source /lib/rdk/getpartnerid.sh
 CODEBIG_BLOCK_TIME=1800
 CODEBIG_BLOCK_FILENAME="/tmp/.lastcodebigfail_dcas"
 FORCE_DIRECT_ONCE="/tmp/.forcedirectonce_dcas"
@@ -60,7 +59,7 @@ if [ ! -f /usr/bin/GetConfigFile ];then
     exit 127
 fi
 
-partnerId="$(getPartnerId)"
+partnerId="RDKM"
 CERTOPTION=""
 
 if [ -f $RDK_PATH/mtlsUtils.sh ]; then

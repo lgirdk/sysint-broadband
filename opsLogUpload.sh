@@ -36,7 +36,6 @@ source $RDK_LOGGER_PATH/logfiles.sh
 source /lib/rdk/utils.sh
 source /lib/rdk/t2Shared_api.sh
 source /etc/device.properties
-source /lib/rdk/getpartnerid.sh
 source $RDK_LOGGER_PATH/logUpload_default_params.sh
 
 if [ -f /nvram/logupload.properties -a $BUILD_TYPE != "prod" ];then
@@ -54,7 +53,7 @@ fi
 SIGN_FILE="/tmp/.signedRequest_$$_`date +'%s'`"
 CODEBIG_BLOCK_TIME=1800
 CODEBIG_BLOCK_FILENAME="/tmp/.lastcodebigfail_opslu"
-partnerId="$(getPartnerId)"
+partnerId="RDKM"
 
 DIRECT_MAX_ATTEMPTS=3
 CODEBIG_MAX_ATTEMPTS=3
