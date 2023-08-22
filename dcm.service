@@ -21,9 +21,8 @@
 
 . /etc/include.properties
 . /etc/device.properties
-source /lib/rdk/getpartnerid.sh
 
-partnerId="$(getPartnerId)"
+partnerId="RDKM"
 
 if [ -f /etc/telemetry2_0.properties ]; then
     . /etc/telemetry2_0.properties
