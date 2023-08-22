@@ -18,9 +18,7 @@
 # limitations under the License.
 ##########################################################################
 
-source /lib/rdk/getpartnerid.sh
-
-partnerId="$(getPartnerId)"
+partnerId="RDKM"
 
 Default_URL_logupload="$(dmcli eRT getv Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.LogUploadURL | grep string | cut -d":" -f3- | cut -d" " -f2- | tr -d ' ')"
 

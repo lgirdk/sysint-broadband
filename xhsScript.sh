@@ -18,7 +18,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ##################################################################################
-source /lib/rdk/getpartnerid.sh
+. /etc/device.properties
 
 retVal=""
 
@@ -27,7 +27,6 @@ if [ ! -f /usr/bin/GetConfigFile ];then
     exit 127
 fi
 
-#partnerId=$(getPartnerId)
 if [ "$BOX_TYPE" = "XB6" -a "$MANUFACTURE" = "Arris" ]; then
     #Use nvm cust_id instead of getPartnerId to avoid syscfg dependency
     cust_idx=`arris_rpc_client arm nvm_get cust_id`
