@@ -23,7 +23,7 @@
 #source /etc/utopia/service.d/log_capture_path.sh
 
 source /lib/rdk/t2Shared_api.sh
-source /lib/rdk/getpartnerid.sh
+. /etc/device.properties
 
 RDK_LOGGER_PATH="/rdklogger"
 
@@ -54,7 +54,7 @@ UploadProtocol=$2
 UploadHttpLink=$3
 UploadOnReboot=$4
 UploadLogsonReboot=$7
-partnerId="$(getPartnerId)"
+partnerId="RDKM"
 
 unscheduledDisable=`syscfg get UploadLogsOnUnscheduledRebootDisable`
 UPLOAD_LOGS=`sysevent get UPLOAD_LOGS_VAL_DCM`

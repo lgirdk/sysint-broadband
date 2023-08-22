@@ -32,7 +32,6 @@ if [ -f /etc/mount-utils/getConfigFile.sh ];then
 fi
 source /etc/log_timestamp.sh
 
-source /lib/rdk/getpartnerid.sh
 source /lib/rdk/getaccountid.sh
 
 source /etc/waninfo.sh
@@ -662,7 +661,7 @@ else
        ## This interface is not accessible from ATOM, replace value from ARM
        estbMac=$(getEstbMac)
        firmwareVersion=$(getFWVersion)
-       partnerId=$(getPartnerId)
+       partnerId="RDKM"
        accountId=$(getAccountId)
        erouterIpv4=$(getErouterIpv4)
        erouterIpv6=$(getErouterIpv6)
