@@ -31,7 +31,6 @@ if [ -f /etc/waninfo.sh ]; then
 fi
 
 source /etc/log_timestamp.sh
-source /lib/rdk/getpartnerid.sh
 source /lib/rdk/getaccountid.sh
 source /lib/rdk/t2Shared_api.sh
 
@@ -68,7 +67,7 @@ CODEBIG_BLOCK_FILENAME="/tmp/.lastcodebigfail_dcm"
 FORCE_DIRECT_ONCE="/tmp/.forcedirectonce_dcm"
 export PATH=$PATH:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/local/lighttpd/sbin:/usr/local/sbin
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/lib
-partnerId=$(getPartnerId)
+partnerId="RDKM"
 
 DIRECT_MAX_ATTEMPTS=3
 CODEBIG_MAX_ATTEMPTS=3
@@ -474,7 +473,6 @@ sendHttpRequestToServer()
         addr_type=""
         [ "x`ifconfig $EROUTER_INTERFACE | grep inet6 | grep -i 'Global'`" != "x" ] || addr_type="-4"
     fi
-    partnerId=$(getPartnerId)
     accountId=$(getAccountId)
     if [ $MODEL_NUM = "WNXL11BWL" ]; then
         erouterMac=`cat /sys/class/net/eth0/address | tr '[a-f]' '[A-F]' `
