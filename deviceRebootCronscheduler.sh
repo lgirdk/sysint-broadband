@@ -55,8 +55,7 @@ calcRebootExecTime()
         #Get local time off set
         time_offset=`dmcli eRT getv Device.Time.TimeOffset | grep "value:" | cut -d ":" -f 3 | tr -d ' '`
 
-
-        #Maintence start and end time in local
+        #Maintence start and end time in UTC
         if [ "x$BOX_TYPE" = "xHUB4" ]
         then
 		main_start_time=$start_time
@@ -89,6 +88,18 @@ calcRebootExecTime()
                 #calculate random hour
                 rand_time=$((rand_time/60))
                 rand_hr=$((rand_time%60))
+
+        #since device time is UTC time so subtracting offset here to run reboot in local time
+        #it may goes to previous day UTC time thus managing with 24 hrs, this can only happen if offset time is greater than random time
+        if [ "x$BOX_TYPE" = "xHUB4" ] ; then
+            time_offset_hr=$((time_offset/3600))
+
+            if [ $time_offset_hr -gt $rand_hr ] ; then
+                rand_hr=$((24+$rand_hr-$time_offset_hr))
+            else
+                rand_hr=$((rand_hr-time_offset_hr))
+            fi
+        fi
 
         echo_t "[deviceRebootCronscheduler.sh] start_time: $start_time, end_time: $end_time" >> $LOG_FILE
         echo_t "[deviceRebootCronscheduler.sh] time_offset: $time_offset" >> $LOG_FILE
