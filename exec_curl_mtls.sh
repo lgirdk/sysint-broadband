@@ -15,6 +15,10 @@ echo_log()
     echo "`date +"%y%m%d-%T.%6N"` : $0: $*" >> $curl_logs
 }
 
+if [ -f /lib/rdk/t2Shared_api.sh ]; then
+    source /lib/rdk/t2Shared_api.sh
+fi
+
 CURL_BIN=/usr/bin/curl
 
 certlist0="/nvram/certs/devicecert_2.pk12"
@@ -55,6 +59,13 @@ exec_curl_mtls () {
                        continue
                     else
                        CURL_CMD="$CURL_BIN --cert-type P12 --cert $cert:$(cat $ID) $CURL_ARGS"
+                    fi
+                fi
+                if [  "$cert" == "$certlist2" ] ; then
+                    UPTIME=$(cut -d' ' -f1 /proc/uptime)
+                    echo_log "xPKIStaticCert: /etc/ssl/certs/staticDeviceCert.pk12 uptime $UPTIME seconds.$0"
+                    if [ -f /lib/rdk/t2Shared_api.sh ]; then
+                        t2ValNotify "SYS_INFO_xPKI_Static_Fallback" "xPKIStaticCert: /etc/ssl/certs/staticDeviceCert.pk12 uptime $UPTIME seconds,$0"
                     fi
                 fi
                 echo_log "CURL_CMD: `echo "$CURL_CMD" | sed -e 's#devicecert_1.pk12[^[:space:]]\+#devicecert_1.pk12<hidden key>#g' \

@@ -20,6 +20,15 @@
 
 . /etc/include.properties
 . /etc/device.properties
+TLS_LOG_FILE="$LOG_PATH/tlsError.log"
+tlsLog()
+{
+    echo "`date +"%y%m%d-%T.%6N"`:$*" >> $TLS_LOG_FILE
+}
+
+if [ -f /lib/rdk/t2Shared_api.sh ]; then
+    source /lib/rdk/t2Shared_api.sh
+fi
 
 getMtlsCreds()
 {
@@ -62,6 +71,11 @@ getMtlsCreds()
             exit 128
         fi
         mtlscreds=" --cert-type P12 --cert /etc/ssl/certs/staticXpkiCrt.pk12:$(cat $ID)"
+        UPTIME=$(cut -d' ' -f1 /proc/uptime)
+        tlsLog "xPKIStaticCert: /etc/ssl/certs/staticDeviceCert.pk12 uptime $UPTIME seconds,$0"
+        if [ -f /lib/rdk/t2Shared_api.sh ]; then
+            t2ValNotify "SYS_INFO_xPKI_Static_Fallback" "xPKIStaticCert: /etc/ssl/certs/staticDeviceCert.pk12 uptime $UPTIME seconds,$0"
+        fi
     fi
     echo "$mtlscreds"
 }
