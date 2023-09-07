@@ -14,7 +14,7 @@ LOG_FILE="$LOG_PATH/stunnel.log"
 
 usage()
 {
-  echo_t "STUNNEL USAGE:  startSTunnel.sh <localport> <jumpfqdn> <umpserver> <jumpserverport> <reverseSSHArgs>"
+  echo_t "STUNNEL USAGE:  startSTunnel.sh <localport> <jumpfqdn> <umpserver> <jumpserverport> <reverseSSHArgs> <shortshostLogin> <nonshortshostLogin>"
 }
 
 if [ $# -lt 5 ]; then
@@ -49,6 +49,18 @@ JUMP_FQDN=$2
 JUMP_SERVER=$3
 JUMP_PORT=$4
 REVERSESSHARGS=$5
+SHORTSHOSTLOGIN=$6
+NONSHORTSHOSTLOGIN=$7
+
+SOURCE_IP=$(echo "$NONSHORTSHOSTLOGIN" | cut -d'@' -f2)
+t2ValNotify "SSH_INFO_SOURCE_IP" "$SOURCE_IP"
+isShortsenabled=$(dmcli eRT getv Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.SHORTS.Enable | grep value | cut -d ":" -f 3 | tr -d ' ')
+echo_t "isShortsenabled = $isShortsenabled " >> $LOG_FILE
+if [ $isShortsenabled == "false" ];then
+        /bin/sh /lib/rdk/startTunnel.sh start ${REVERSESSHARGS}${NONSHORTSHOSTLOGIN}
+        exit 0
+fi
+
 
 #RDM parameters
 DNLD_SCRIPT=/lib/rdk/shortsDownload.sh
@@ -143,7 +155,7 @@ if [ -z "$STUNNELPID" ]; then
 fi
 
 #Starting startTunnel
-/bin/sh /lib/rdk/startTunnel.sh start $REVERSESSHARGS
+/bin/sh /lib/rdk/startTunnel.sh start ${REVERSESSHARGS}${SHORTSHOSTLOGIN}
 
 REVSSHPID2=`cat $REVSSH_PID_FILE`
 

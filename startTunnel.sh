@@ -24,6 +24,10 @@
 
 source /etc/waninfo.sh
 
+if [ -f /lib/rdk/t2Shared_api.sh ]; then
+                source /lib/rdk/t2Shared_api.sh
+fi
+
 WAN_INTERFACE=$(getWanInterfaceName)
 usage()
 {
@@ -121,6 +125,7 @@ case $oper in
 			fi
 			if [ -z "$CM_IP" -a -z "$CM_IPV4" ]; then
 				echo "Error: There is no valid CM interface configured and error while starting ssh process."
+                                t2CountNotify "REVSSH_CMINTERFACE_FAILURE"
 				exit 127
 			fi
 		elif [ $BOX_TYPE = "XF3" ]; then
@@ -137,10 +142,20 @@ case $oper in
              args=`echo $* | sed "s/CM_IP/$CM_IP/g"`
              if [ ! -f /usr/bin/GetConfigFile ];then
                  echo "Error: GetConfigFile Not Found"
+                 t2CountNotify "REVSSH_GETCONFIGFILE_FAILURE"
                  exit 127
              fi
+             REVSSH_PID1=`cat /var/tmp/rssh.pid `
              GetConfigFile /tmp/nvgeajacl.ipe stdout | /usr/bin/ssh -i /dev/stdin $args &
              sleep 10
+             REVSSH_PID2=`cat /var/tmp/rssh.pid `
+             if [ -z "$REVSSH_PID2" ] ||[ "$REVSSH_PID1" == "$REVSSH_PID2" ]; then
+                     echo "SSH Tunnel failure. "
+                     t2CountNotify "REVSSH_FAILURE"
+             else
+                     echo " SSH Tunnel success. "
+                     t2CountNotify "REVSSH_SUCCESS"
+             fi
              exit 1
              ;;
            stop)
