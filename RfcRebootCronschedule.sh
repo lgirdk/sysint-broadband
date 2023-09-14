@@ -94,6 +94,8 @@ ScheduleCron()
 {
         # Dump existing cron jobs to a file & add new job
         crontab -l -c $CRONTAB_DIR > $CRONFILE_BK
+        # remove a possible existeing reboot job
+        sed -i '/RFC_Reboot\.sh/d' $CRONFILE_BK
         echo "$rand_min $rand_hr * * * /etc/RFC_Reboot.sh" >> $CRONFILE_BK
         crontab $CRONFILE_BK -c $CRONTAB_DIR
         rm -rf $CRONFILE_BK
