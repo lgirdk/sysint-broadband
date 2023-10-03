@@ -281,6 +281,7 @@ bootup_remove_old_backupfiles()
 				rm -rf $LOG_BACK_UP_REBOOT*.log*
 				rm -rf $LOG_BACK_UP_REBOOT*.txt*
 				rm -rf $LOG_BACK_UP_REBOOT*core*
+				rm -rf $LOG_BACK_UP_REBOOT*.bin*
 
 				if [ "$BOX_TYPE" == "HUB4" ] || [ "$BOX_TYPE" == "SR300" ] || [ "x$BOX_TYPE" == "xSR213" ] || [ "$BOX_TYPE" == "SE501" ] || [ "$BOX_TYPE" == "WNXL11BWL" ]; then
 					rm -rf $LOG_BACK_UP_REBOOT*tar.gz*
@@ -379,6 +380,7 @@ bootup_tarlogs()
                rm -rf $TarCreatePath*.txt*
 	       rm -rf $TarCreatePath*.log*
 	       rm -rf $TarCreatePath*core*
+	       rm -rf $TarCreatePath*.bin*
 	       if [ "$BOX_TYPE" == "HUB4" ] || [ "$BOX_TYPE" == "SR300" ] || [ "x$BOX_TYPE" == "xSR213" ] || [ "$BOX_TYPE" == "SE501" ] || [ "$BOX_TYPE" == "WNXL11BWL" ]; then
 		rm -rf $TarCreatePath*tar.gz*
 	       fi

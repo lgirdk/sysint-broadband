@@ -361,6 +361,7 @@ CopyToTmp()
 	rm -rf $LOG_SYNC_BACK_UP_PATH*.txt*
 	rm -rf $LOG_SYNC_BACK_UP_PATH*.log*
 	rm -rf $LOG_SYNC_BACK_UP_PATH*core*
+	rm -rf $LOG_SYNC_BACK_UP_PATH*.bin*
 	if [ "$BOX_TYPE" == "HUB4" ]; then
 		rm -rf $LOG_SYNC_BACK_UP_PATH*tar.gz*
 	fi
@@ -620,6 +621,7 @@ backupnvram2logs()
 	rm -rf $LOG_SYNC_PATH*.txt*
 	rm -rf $LOG_SYNC_PATH*.log*
 	rm -rf $LOG_SYNC_PATH*core*
+	rm -rf $LOG_SYNC_PATH*.bin*
 	if [ "$BOX_TYPE" == "HUB4" ] || [ "$BOX_TYPE" == "SR300" ] || [ "x$BOX_TYPE" == "xSR213" ] || [ "$BOX_TYPE" == "SE501" ] || [ "$BOX_TYPE" == "WNXL11BWL" ]; then
 		rm -rf $LOG_SYNC_PATH*tar.gz*
 	fi
@@ -721,6 +723,7 @@ backupnvram2logs_on_reboot()
 	rm -rf $TarFolder*.txt*
 	rm -rf $TarFolder*.log*
 	rm -rf $TarFolder*core*
+	rm -rf $TarFolder*.bin*
 
 	if [ "$BOX_TYPE" == "HUB4" ] || [ "$BOX_TYPE" == "SR300" ] || [ "$BOX_TYPE" == "SR213" ] || [ "$BOX_TYPE" == "SE501" ] || [ "$BOX_TYPE" == "WNXL11BWL" ]; then
 		rm -rf $TarFolder*tar.gz*
