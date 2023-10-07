@@ -21,8 +21,6 @@
 while :
 do
 
-sleep 1h
-
 T2_MSG_CLIENT=/usr/bin/telemetry2_0_client
 
 t2ValNotify() {
@@ -32,6 +30,16 @@ t2ValNotify() {
         $T2_MSG_CLIENT "$marker" "$*"
     fi
 }
+
+getstat() {
+	grep 'cpu ' /proc/stat | sed -e 's/  */x/g' -e 's/^cpux//'
+}
+
+STARTSTAT_HOUR=$(getstat)
+LOG_FILE="/rdklogs/logs/CPUInfoPeer.txt.0"
+
+#This script runs once in 1 hour, sleep 45 minutes now and 15 minutes later during cpu usage for last 15 minutes calculation
+sleep 45m
 
 uptime=$(cut -d. -f1 /proc/uptime)
 echo "before running log_mem_cpu_info_atom.sh.sh printing top output" >> /rdklogs/logs/CPUInfoPeer.txt.0
@@ -63,10 +71,6 @@ TMPFS_THRESHOLD=85
 		echo "$dandtwithns_now"
 	}
 
-	getstat() {
-	    grep 'cpu ' /proc/stat | sed -e 's/  */x/g' -e 's/^cpux//'
-	}
-
 	extract() {
 	    echo $1 | cut -d 'x' -f $2
 	}
@@ -76,8 +80,45 @@ TMPFS_THRESHOLD=85
 	    local b=$(extract $STARTSTAT $1)
 	    local diff=$(( $e - $b ))
 	    echo $diff
-	}
+    }
 
+    calculate_cpu_use()
+    {
+	    USR=$(change 1)
+	    SYS=$(change 3)
+	    IDLE=$(change 4)
+	    IOW=$(change 5)
+	    IRQ=$(change 6)
+	    SIRQ=$(change 7)
+	    STEAL=$(change 8)
+
+	    ACTIVE=$(( $USR + $SYS + $IOW + $IRQ + $SIRQ + $STEAL))
+
+	    TOTAL=$(($ACTIVE + $IDLE))
+
+	    Curr_CPULoad=$(( $ACTIVE * 100 / $TOTAL ))
+	    echo "$Curr_CPULoad"
+    }
+
+    print_cpu_usage()
+    {
+	    if [ "$1" = "" ] || [ "$2" = "" ]; then
+		    echo_t "No parameters for the function print_cpu_usage" >> "$LOG_FILE"
+		    return
+	    fi
+	    timestamp=$(getDate)
+	    echo_t "RDKB_CPU_USAGE: marker $1 is $2 at timestamp $timestamp" >> "$LOG_FILE"
+	    if [ "$2" -ge "90" ]; then
+		    echo_t "WARNING RDKB_CPU_USAGE_AVERAGE is more than 90% for marker : $1 : $2  at timestamp $timestamp" >> "$LOG_FILE"
+		    if [ $2 -eq 100 ]; then
+			    t2CountNotify "SYS_ERROR_CPU100"
+		    fi
+	    fi
+	    echo_t "$1:$2" >> "$LOG_FILE"
+	    t2ValNotify "$1" "$2"
+    }
+
+	FIFTEEN_MINUTES=900
 	max_count=12
 	DELAY=30
 	if [ -f $COUNTINFO ]
@@ -94,49 +135,51 @@ TMPFS_THRESHOLD=85
 		freeMemSys=`free | awk 'FNR == 2 {print $4}'`
 		availableMemSys=`free | awk 'FNR == 2 {print $7}'`
 
-		echo "RDKB_SYS_MEM_INFO_ATOM : Total memory in system is $totalMemSys at timestamp $timestamp"
-		echo "RDKB_SYS_MEM_INFO_ATOM : Used memory in system is $usedMemSys at timestamp $timestamp"
-		echo "RDKB_SYS_MEM_INFO_ATOM : Free memory in system is $freeMemSys at timestamp $timestamp"
-		echo "RDKB_SYS_MEM_INFO_ATOM : Available memory in system is $availableMemSys at timestamp $timestamp"
+		echo "RDKB_SYS_MEM_INFO_ATOM : Total memory in system is $totalMemSys at timestamp $timestamp" >> "$LOG_FILE"
+		echo "RDKB_SYS_MEM_INFO_ATOM : Used memory in system is $usedMemSys at timestamp $timestamp" >> "$LOG_FILE"
+		echo "RDKB_SYS_MEM_INFO_ATOM : Free memory in system is $freeMemSys at timestamp $timestamp" >> "$LOG_FILE"
+		echo "RDKB_SYS_MEM_INFO_ATOM : Available memory in system is $availableMemSys at timestamp $timestamp" >> "$LOG_FILE"
 
-		echo "USED_MEM_ATOM:$usedMemSys"
-		echo "FREE_MEM_ATOM:$freeMemSys"
-		echo "AVAILABLE_MEM_ATOM:$availableMemSys"
+		echo "USED_MEM_ATOM:$usedMemSys" >> "$LOG_FILE"
+		echo "FREE_MEM_ATOM:$freeMemSys" >> "$LOG_FILE"
+		echo "AVAILABLE_MEM_ATOM:$availableMemSys" >> "$LOG_FILE"
 
 		t2ValNotify "USED_MEM_ATOM_split" "$usedMemSys"
 		t2ValNotify "FREE_MEM_ATOM_split" "$freeMemSys"
 		t2ValNotify "AVAILABLE_MEM_ATOM_split" "$availableMemSys"
 
 	    LOAD_AVG=`uptime | awk -F'[a-z]:' '{ print $2}' | sed 's/^ *//g' | sed 's/,//g' | sed 's/ /:/g'`
-	    echo " RDKB_LOAD_AVERAGE_ATOM : Load Average is $LOAD_AVG at timestamp $timestamp"
+	    echo " RDKB_LOAD_AVERAGE_ATOM : Load Average is $LOAD_AVG at timestamp $timestamp" >> "$LOG_FILE"
 	    LOAD_AVG_15=`echo $LOAD_AVG | cut -f3 -d:`
-	    echo_t "LOAD_AVERAGE_ATOM:$LOAD_AVG_15"
+	    echo_t "LOAD_AVERAGE_ATOM:$LOAD_AVG_15" >> "$LOG_FILE"
 	    t2ValNotify "LOAD_AVG_ATOM_split" "$LOAD_AVG_15"
 
-	    #Record the start statistics
+	    STARTSTAT_15MIN=$(getstat)
+	    sleep `expr $FIFTEEN_MINUTES - $DELAY`
+	    STARTSTAT=$(getstat)
+	    sleep $DELAY
+	    ENDSTAT=$(getstat)
+	    Curr_CPULoad=$(calculate_cpu_use)
+	    #Average of CPU USAGE from last 30 seconds
+	    print_cpu_usage "USED_CPU_ATOM_split" "$Curr_CPULoad"
 
-		STARTSTAT=$(getstat)
+	    STARTSTAT="$STARTSTAT_15MIN"
+	    Curr_CPULoad=$(calculate_cpu_use)
+	    #Average of CPU USAGE from last 15 minutes
+	    print_cpu_usage "USED_CPU_15MIN_ATOM_split" "$Curr_CPULoad"
 
-		sleep $DELAY
+	    #Average of CPU USAGE from last 1 hour.
+	    ENDSTAT=$(getstat)
+	    if [ "$STARTSTAT_HOUR" != "" ]; then
+		    STARTSTAT="$STARTSTAT_HOUR"
+		    Curr_CPULoad=$(calculate_cpu_use)
+		    print_cpu_usage "USED_CPU_HOURLY_ATOM_split" "$Curr_CPULoad"
+	    fi
 
-	    #Record the end statistics
-		ENDSTAT=$(getstat)
-
-		USR=$(change 1)
-		SYS=$(change 3)
-		IDLE=$(change 4)
-		IOW=$(change 5)
-
-
-		ACTIVE=$(( $USR + $SYS + $IOW ))
-
-		TOTAL=$(($ACTIVE + $IDLE))
-
-		Curr_CPULoad=$(( $ACTIVE * 100 / $TOTAL ))
-		timestamp=`getDate`
-		echo "RDKB_CPU_USAGE_ATOM : CPU usage is $Curr_CPULoad at timestamp $timestamp"
-		echo_t "USED_CPU_ATOM:$Curr_CPULoad"
-                t2ValNotify "USED_CPU_ATOM_split" "$Curr_CPULoad"
+	    #Average of CPU USAGE from the device boot
+	    STARTSTAT=0x0x0x0x0x0x0x0x0x0
+	    Curr_CPULoad=$(calculate_cpu_use)
+	    print_cpu_usage "USED_CPU_DEVICE_BOOT_ATOM_split" "$Curr_CPULoad"
 
 		count=$((count + 1))
 
@@ -221,6 +264,8 @@ TMPFS_THRESHOLD=85
 	top -n1 -b >> /rdklogs/logs/CPUInfoPeer.txt.0
 else
 	echo "skipping log_mem_cpu_info_atom.sh run" >> /rdklogs/logs/AtomConsolelog.txt.0
+	#This sleep is to avoid infinite prints in case of error.
+	sleep $DELAY
 fi
 
 done
