@@ -505,7 +505,7 @@ uploadOnRequest()
         fi
         mkdir -p $blog_dir$timeRequested
         cp /version.txt $blog_dir$timeRequested
-	if [ "$MODEL_NUM" = "CGM4981COM" ]; then
+	if [ "$MODEL_NUM" = "CGM4981COM" ]  || [ "$MODEL_NUM" == "SR213" ]; then
 	      SE05x_rdk_logs="se05x_daemon.log"
 	      SE05x_tmp_logs="/tmp/rdkssa.txt"
 	      cp $SE05x_tmp_logs $blog_dir$timeRequested$SE05x_rdk_logs

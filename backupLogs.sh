@@ -182,7 +182,7 @@ backupLogsonReboot()
 	#fi
 	cd $LOG_BACK_UP_REBOOT
 	cp /version.txt $LOG_BACK_UP_REBOOT$dt
-	if [ "$MODEL_NUM" = "CGM4981COM" ]; then
+	if [ "$MODEL_NUM" = "CGM4981COM" ] || [ "$MODEL_NUM" == "SR213" ]; then
 	      cp $SE05x_tmp_logs $LOG_BACK_UP_REBOOT$dt$SE05x_rdk_logs
 	fi
 
@@ -293,7 +293,7 @@ backupLogsonReboot_nvram2()
 
 	cd $LOG_SYNC_BACK_UP_REBOOT_PATH
         cp /version.txt $LOG_SYNC_PATH
-	if [ "$MODEL_NUM" = "CGM4981COM" ]; then
+	if [ "$MODEL_NUM" = "CGM4981COM" ] || [ "$MODEL_NUM" == "SR213" ]; then
 	      cp $SE05x_tmp_logs $LOG_SYNC_PATH$SE05x_rdk_logs
 	fi
 
