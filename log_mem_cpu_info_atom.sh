@@ -23,6 +23,13 @@ do
 
 T2_MSG_CLIENT=/usr/bin/telemetry2_0_client
 
+t2CountNotify() {
+    if [ -f $T2_MSG_CLIENT ]; then
+        marker=$1
+        $T2_MSG_CLIENT  "$marker" "1"
+    fi
+}
+
 t2ValNotify() {
     if [ -f $T2_MSG_CLIENT ]; then
         marker=$1
@@ -37,6 +44,7 @@ getstat() {
 
 STARTSTAT_HOUR=$(getstat)
 LOG_FILE="/rdklogs/logs/CPUInfoPeer.txt.0"
+LOW_MEM_THRESHOLD=30000
 
 #This script runs once in 1 hour, sleep 45 minutes now and 15 minutes later during cpu usage for last 15 minutes calculation
 sleep 45m
@@ -111,7 +119,16 @@ TMPFS_THRESHOLD=85
 	    if [ "$2" -ge "90" ]; then
 		    echo_t "WARNING RDKB_CPU_USAGE_AVERAGE is more than 90% for marker : $1 : $2  at timestamp $timestamp" >> "$LOG_FILE"
 		    if [ $2 -eq 100 ]; then
-			    t2CountNotify "SYS_ERROR_CPU100"
+			    t2CountNotify "SYS_ERROR_CPU100_ATOM"
+		    fi
+		    if [ "$1" = "USED_CPU_15MIN_ATOM_split" ]; then
+			    t2CountNotify "SYS_ERROR_USED_CPU_15MIN_ATOM_Above90"
+		    fi
+		    if [ "$1" = "USED_CPU_HOURLY_ATOM_split" ]; then
+			    t2CountNotify "SYS_ERROR_USED_CPU_HOURLY_ATOM_Above90"
+		    fi
+		    if [ "$1" = "USED_CPU_DEVICE_BOOT_ATOM_split" ]; then
+			    t2CountNotify "SYS_ERROR_USED_CPU_DEVICE_BOOT_ATOM_Above90"
 		    fi
 	    fi
 	    echo_t "$1:$2" >> "$LOG_FILE"
@@ -147,6 +164,11 @@ TMPFS_THRESHOLD=85
 		t2ValNotify "USED_MEM_ATOM_split" "$usedMemSys"
 		t2ValNotify "FREE_MEM_ATOM_split" "$freeMemSys"
 		t2ValNotify "AVAILABLE_MEM_ATOM_split" "$availableMemSys"
+
+		if [ $freeMemSys -lt $LOW_MEM_THRESHOLD ]; then
+			echo_t "ERROR free memory is less than threshold value $LOW_MEM_THRESHOLD FREE_MEM_ATOM:$freeMemSys at timesstamp $timestamp" >> "$LOG_FILE"
+			t2CountNotify "SYS_ERROR_LOW_FREE_MEMORY_ATOM"
+		fi
 
 	    LOAD_AVG=`uptime | awk -F'[a-z]:' '{ print $2}' | sed 's/^ *//g' | sed 's/,//g' | sed 's/ /:/g'`
 	    echo " RDKB_LOAD_AVERAGE_ATOM : Load Average is $LOAD_AVG at timestamp $timestamp" >> "$LOG_FILE"
