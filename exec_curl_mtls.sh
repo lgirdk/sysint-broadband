@@ -74,7 +74,6 @@ exec_curl_mtls () {
                                        -e 's#configsethash:[^[:space:]]\+#configsethash:#g' \
                                        -e 's#configsettime:[^[:space:]]\+#configsettime:#g' \
                                        -e 's#AWSAccessKeyId=.*Signature=.*&##g' \
-                                       -e 's#-H .*https#https#g' \
                                        `"
 
                 result=` eval $CURL_CMD > $HTTP_CODE`
