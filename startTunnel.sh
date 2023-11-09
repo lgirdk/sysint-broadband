@@ -145,7 +145,11 @@ case $oper in
                  t2CountNotify "REVSSH_GETCONFIGFILE_FAILURE"
                  exit 127
              fi
-             REVSSH_PID1=`cat /var/tmp/rssh.pid `
+             if [ -f /var/tmp/rssh.pid ];then
+                     REVSSH_PID1=`cat /var/tmp/rssh.pid `
+             else
+                     REVSSH_PID1=""
+             fi
              GetConfigFile /tmp/nvgeajacl.ipe stdout | /usr/bin/ssh -i /dev/stdin $args &
              sleep 10
              REVSSH_PID2=`cat /var/tmp/rssh.pid `
