@@ -9,7 +9,7 @@ curl_logs="$LOG_FOLDER/logs/Curlmtlslog.txt.0"
 if [ ! -f $curl_logs ]; then
     touch $curl_logs
 fi
-
+UseSEBasedCert=`cat /etc/device.properties | grep UseSEBasedCert  | cut -f2 -d=`
 echo_log()
 {
     echo "`date +"%y%m%d-%T.%6N"` : $0: $*" >> $curl_logs
@@ -39,8 +39,12 @@ exec_curl_mtls () {
 
         for certnum in 0 1 2 ; do
             eval cert="\$certlist$certnum"
+            if [[ "$cert" == *"devicecert_2.pk12"* ]] && [ "$UseSEBasedCert" != "true" ]; then
+                echo_log "Device operational cert2 not supported for $MODEL_NUM"
+                continue
+            fi
             if [ ! -f $cert ] ; then
-                if [[ "$cert" == *"devicecert_2.pk12"* ]] && [ "$MODEL_NUM" != "CGM4981COM" ]; then
+                if [[ "$cert" == *"devicecert_2.pk12"* ]] && [ "$UseSEBasedCert" != "true" ]; then
                      echo_log "Device operational cert2 not supported"
                 else
                      echo_log "$cert not found!!!"
