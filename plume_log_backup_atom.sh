@@ -30,7 +30,7 @@ RDK_LOGS_PATH=/rdklogs/logs/
 LOG_BACK_UP_PATH=/tmp/Plumelogbackup_ATOM/
 
 #Check is plume log pull is enabled. Perform backup only if Plume log pull is enabled
-logpull_enable=`syscfg get son_logpull_enable`
+logpull_enable=`rpcclient2 'syscfg get son_logpull_enable' | tail -n 2 | head -n 1`
 if [ -z "$logpull_enable" ] || [ "$logpull_enable" = "0" ] ;
 then
     exit
