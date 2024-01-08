@@ -164,7 +164,7 @@ getMacAddress()
         mac=`dmcli eRT retv Device.DPoE.Mac_address`
     elif [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "TCCBR" ];then
         mac=`dmcli eRT retv Device.X_CISCO_COM_CableModem.MACAddress`
-    elif [ "$BOX_TYPE" = "HUB4" ] || [ "$BOX_TYPE" = "SR300" ] || [ "x$BOX_TYPE" = "xSR213" ] || [ "$BOX_TYPE" = "SE501" ] || [ "$BOX_TYPE" = "WNXL11BWL" ]; then
+    elif [ "$BOX_TYPE" = "HUB4" ] || [ "$BOX_TYPE" = "SR300" ] || [ "x$BOX_TYPE" = "xSR213" ] || [ "$BOX_TYPE" = "SE501" ] || [ "$BOX_TYPE" = "WNXL11BWL" ] || [ "$BOX_TYPE" = "VNTXER5" ]; then
         #FEATURE_RDKB_WAN_MANAGER
         mac=`cat /sys/class/net/$WANINTERFACE/address | tr '[a-f]' '[A-F]' `
         if [ -z "$mac" ]; then
