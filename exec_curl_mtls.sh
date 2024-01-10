@@ -39,16 +39,12 @@ exec_curl_mtls () {
 
         for certnum in 0 1 2 ; do
             eval cert="\$certlist$certnum"
-            if [[ "$cert" == *"devicecert_2.pk12"* ]] && [ "$UseSEBasedCert" != "true" ]; then
+            if [[ "$cert" == "$certlist0" ]] && [ "$UseSEBasedCert" != "true" ]; then
                 echo_log "Device operational cert2 not supported for $MODEL_NUM"
                 continue
             fi
             if [ ! -f $cert ] ; then
-                if [[ "$cert" == *"devicecert_2.pk12"* ]] && [ "$UseSEBasedCert" != "true" ]; then
-                     echo_log "Device operational cert2 not supported"
-                else
-                     echo_log "$cert not found!!!"
-                fi
+                echo_log "$cert not found!!!"
                 continue
             else
                 eval passcode="\$passlist$certnum"
