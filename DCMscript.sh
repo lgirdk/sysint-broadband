@@ -584,6 +584,7 @@ fi
 
 if [ "x$T2_ENABLE" == "xtrue" ]; then
     t2Pid=`pidof $T2_0_APP`
+    MAX_RETRY_T2_REPORT=10
     if [ -z "$t2Pid" ]; then
         echo "${T2_BIN} is present, XCONF config fetch and parse will be handled by T2 implementation" >> $DCM_LOG_FILE
         t2Log "Clearing markers from $TELEMETRY_PATH"
@@ -593,12 +594,11 @@ if [ "x$T2_ENABLE" == "xtrue" ]; then
         mkdir -p $T2_XCONF_PERSISTENT_PATH
         t2Log "Starting $T2_0_BIN daemon."
         ${T2_0_BIN}
-        MAX_RETRY_T2_REPORT=10
         count=0
         if [ -f $DEFAULT_REPORT_FILE ]; then
-            while [ ! -f /tmp/.t2ReadyToReceiveEvents ]
+            while [ ! -f /tmp/.t2ReadyToReceiveEvents ] && [ ! -f /tmp/t2DcmComplete ]
             do
-                echo_t "Wait for T2 to Receive Events"
+                echo_t "Wait for T2 to Receive Events AND config fetch to complete"
                 sleep 10
                 let count++
                 if [ $count -eq $MAX_RETRY_T2_REPORT ]; then
@@ -616,8 +616,19 @@ if [ "x$T2_ENABLE" == "xtrue" ]; then
     else
          mkdir -p $TELEMETRY_PATH_TEMP
          t2Log "telemetry daemon is already running .. Trigger from maintenance window."
-         t2Log "Send signal 15 $T2_0_APP to restart for config fetch "
+         t2Log "Send signal 12 $T2_0_APP to restart for config fetch "
+         rm -f /tmp/t2DcmComplete
          kill -12 $t2Pid
+         count=0
+         while [ ! -f /tmp/t2DcmComplete ]
+         do
+             echo_t "Wait for T2 Config fetch to complete"
+             sleep 10
+             let count++
+             if [ $count -eq $MAX_RETRY_T2_REPORT ]; then
+                 break
+             fi
+         done
     fi
     ## Clear any dca_utility.sh cron entries if present from T1.1 previous execution
     tempfile="/tmp/tempfile$$.txt"
