@@ -191,7 +191,8 @@ useDirectRequest()
        echo_t "S3 URL is : $S3_URL"
        echo_t "Trial $retries for DIRECT ..."
 
-       ret=` exec_curl_mtls "$CURL_ARGS"`
+       FQDN=`echo "$S3_URL" | awk -F/ '{print $3}'`
+       ret=` exec_curl_mtls "$CURL_ARGS" "opsLogUL" "$FQDN"`
        if [ -f $HTTP_CODE ];
        then
            http_code=$(awk '{print $1}' $HTTP_CODE )

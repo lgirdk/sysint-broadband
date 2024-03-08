@@ -307,8 +307,9 @@ useDirectRequest()
            EROUTER_INTERFACE=$(getWanInterfaceName)
        fi
        CURL_ARGS="-w '%{http_code}\n' --tlsv1.2 --interface $EROUTER_INTERFACE $addr_type $CERT_STATUS --connect-timeout $timeout -m $timeout -o  \"$tmpHttpResponse\" '$HTTPS_URL$JSONSTR'"
+       FQDN=`echo "$HTTPS_URL" | awk -F/ '{print $3}'`
        if [ "$DEVICE_TYPE" = "broadband" ] ; then
-            ret=` exec_curl_mtls "$CURL_ARGS"`
+            ret=` exec_curl_mtls "$CURL_ARGS" "DCM" "$FQDN"`
        else
             CURL_CMD=" curl $CERT $CURL_ARGS"
             result=` eval $CURL_CMD > $HTTP_CODE`

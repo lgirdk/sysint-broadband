@@ -245,8 +245,9 @@ useDirectRequest()
     fi
     echo_t "dca: Json message - $1" >> $RTL_LOG_FILE
     CURL_ARGS="-s $TLS -w '%{http_code}\n' --interface $EROUTER_INTERFACE $addr_type -H \"Accept: application/json\" -H \"Content-type: application/json\" -X POST -d '$1' -o \"$HTTP_FILENAME\" \"$DCA_UPLOAD_URL\" $CERT_STATUS --connect-timeout $CURL_TIMEOUT -m $CURL_TIMEOUT"
+    FQDN=`echo "$DCA_UPLOAD_URL" | awk -F/ '{print $3}'`
     if [ "$DEVICE_TYPE" = "broadband" ]; then
-	ret=` exec_curl_mtls "$CURL_ARGS"`
+	ret=` exec_curl_mtls "$CURL_ARGS" "DCA" "$FQDN"`
     else
 	CURL_CMD="curl $CERTOPTION $CURL_ARGS"
 	result=` eval $CURL_CMD > $HTTP_CODE`

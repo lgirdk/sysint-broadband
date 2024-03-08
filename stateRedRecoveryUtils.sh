@@ -26,10 +26,16 @@
 stateRedSprtFile="/lib/rdk/stateRedRecovery.sh"
 stateRedFlag="/tmp/stateRedEnabled"
 STATE_RED_LOG_FILE="/rdklogs/logs/xconf.txt.0"
+tlsErr_logs="/rdklogs/logs/tlsError.log"
 
 stateRedlog ()
 {
     echo_t "$*" >> "$STATE_RED_LOG_FILE"
+}
+
+tlsLog()
+{
+    echo "`date +"%y%m%d-%T.%6N"` : $0: $*" >> $tlsErr_logs
 }
 
 #isStateRedSupported; check if state red supported
@@ -66,6 +72,11 @@ unsetStateRed()
    if [ -f $stateRedFlag ]; then
        stateRedlog "unsetStateRed: Exiting State Red"
        rm -f $stateRedFlag
+       tlsLog "unsetStateRed: State Red Recovery Flag Unset!!!"
+       tlsLog "unsetStateRed: Exiting from State Red Firmware download Service!!!"
+       if [ -f /lib/rdk/t2Shared_api.sh ]; then
+           t2ValNotify "certerr_split" "State Red Recovery Exit"
+       fi
    fi
    rm -f /tmp/stateredidx
    stateredRecoveryURL=""
@@ -90,6 +101,11 @@ checkAndEnterStateRed()
         rm -f $CODEBIG_BLOCK_FILENAME
         rm -f $DOWNLOAD_INPROGRESS
         touch $stateRedFlag
+        tlsLog "checkAndEnterStateRed: State Red Recovery Flag Set!!!"
+        tlsLog "checkAndEnterStateRed: Triggering State Red Firmware download Service!!!"
+        if [ -f /lib/rdk/t2Shared_api.sh ]; then
+            t2ValNotify "certerr_split" "State Red Recovery Start"
+        fi
         exit 1
     ;;
     esac

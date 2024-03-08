@@ -5,14 +5,23 @@ LOG_FOLDER="/rdklogs"
 . /etc/device.properties
 
 curl_logs="$LOG_FOLDER/logs/Curlmtlslog.txt.0"
+tlsErr_logs="$LOG_FOLDER/logs/tlsError.log"
 
 if [ ! -f $curl_logs ]; then
     touch $curl_logs
+fi
+if [ ! -f $tlsErr_logs ]; then
+    touch $tlsErr_logs
 fi
 UseSEBasedCert=`cat /etc/device.properties | grep UseSEBasedCert  | cut -f2 -d=`
 echo_log()
 {
     echo "`date +"%y%m%d-%T.%6N"` : $0: $*" >> $curl_logs
+}
+
+tlsLog()
+{
+    echo "`date +"%y%m%d-%T.%6N"` : $0: $*" >> $tlsErr_logs
 }
 
 if [ -f /lib/rdk/t2Shared_api.sh ]; then
@@ -35,6 +44,8 @@ getConfigFile_id2="/tmp/.cfgStaticxpki"
 exec_curl_mtls () {
 
         CURL_ARGS=$1
+        MOD=$2
+        FQDN=$3
         TLSRet=1
 
         for certnum in 0 1 2 ; do
@@ -96,6 +107,10 @@ exec_curl_mtls () {
                     case $TLSRet in
                     35|51|53|54|58|59|60|64|66|77|80|82|83|90|91)
                            echo_log "curl ret $TLSRet http_code $http_code"
+                           tlsLog "CERTERR, $MOD, $TLSRet, $FQDN, $cert"
+                           if [ -f /lib/rdk/t2Shared_api.sh ]; then
+                               t2ValNotify "certerr_split" "$MOD, $TLSRet, $FQDN, $cert"
+                           fi
                            continue
                     ;;
                     esac

@@ -341,7 +341,8 @@ useDirectRequest()
                 http_code=-1
                 break;
             fi
-            ret=` exec_curl_mtls "$CURL_ARGS"`
+            FQDN=`echo "$S3_URL" | awk -F/ '{print $3}'`
+            ret=` exec_curl_mtls "$CURL_ARGS" "RDKBLogUL" "$FQDN"`
             if [ -f $HTTP_CODE ] ; then
                http_code=$(awk '{print $1}' $HTTP_CODE)
                if [ "$http_code" != "" ];then
