@@ -95,8 +95,9 @@ checkAndEnterStateRed()
     fi
 
 #Enter state red on ssl or cert errors
+#HTTP code 495 - Expired certs not in servers allow list
     case $curlReturnValue in
-    35|51|53|54|58|59|60|64|66|77|80|82|83|90|91)
+    35|51|53|54|58|59|60|64|66|77|80|82|83|90|91|495)
         stateRedlog "checkAndEnterStateRed: Curl SSL/TLS error ($curlReturnValue). Set State Red Recovery Flag and Exit!!!"
         rm -f $CODEBIG_BLOCK_FILENAME
         rm -f $DOWNLOAD_INPROGRESS
