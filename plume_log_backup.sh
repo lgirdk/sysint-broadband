@@ -30,6 +30,10 @@ BCKUP_MAXSIZE=800000
 RDK_LOGS_PATH=/rdklogs/logs/
 LOG_BACK_UP_PATH=/tmp/Plumelogbackup/
 
+#Do not backup logs if plume is disabled
+[ "$(syscfg get son_admin_status)" = "1" ] || exit 0
+[ "$(syscfg get son_operational_status)" = "1" ] || exit 0
+
 #Check is plume log pull is enabled. Perform backup only if Plume log pull is enabled
 logpull_enable=`syscfg get son_logpull_enable`
 if [ -z "$logpull_enable" ] || [ "$logpull_enable" = "0" ] ;
