@@ -275,12 +275,23 @@ TMPFS_THRESHOLD=85
         nvram_fsck="/rdklogger/nvram_rw_restore.sh"
 	nvram_ro_fs=`mount | grep "nvram " | grep dev | grep "[ (]ro[ ,]"`
 	if [ "$nvram_ro_fs" != "" ]; then
-		echo "[RDKB_SELFHEAL] : NVRAM ON ATOM IS READ-ONLY"
+		echo "[RDKB_SELFHEAL] : NVRAM ON ATOM IS READ-ONLY" >> "$LOG_FILE"
                 if [ -f $nvram_fsck ] && [ ! -e /tmp/atom_ro ]; then
                     source $nvram_fsck
                 fi
 	fi
 
+	NVRAM_USAGE=$(df /nvram | sed -n 's/.* \([0-9]\+\)% .*/\1/p')
+	t2ValNotify "NVRAM_USE_PERCENTAGE_ATOM_split" "$NVRAM_USAGE"
+	echo_t "[RDKB_SELFHEAL] : NVRAM_USE_PERCENTAGE_ATOM_split $NVRAM_USAGE" >> "$LOG_FILE"
+
+	if [ "$NVRAM_USAGE" -ge 95 ]; then
+		t2CountNotify "SYS_ERROR_NVRAM_ATOM_Above95_split"
+		echo_t "WARNING ATOM Nvram usage is $NVRAM_USAGE % at timestamp $timestamp" >> "$LOG_FILE"
+		echo_t "*********** dump file usage in atom nvram **************" >> "$LOG_FILE"
+		echo_t "`du -ah /nvram`" >> "$LOG_FILE"
+		echo_t "******************************" >> "$LOG_FILE"
+	fi
 
         echo "after running log_mem_cpu_info_atom..sh printing top output" >> /rdklogs/logs/CPUInfoPeer.txt.0 
 	top -n1 -b >> /rdklogs/logs/CPUInfoPeer.txt.0
