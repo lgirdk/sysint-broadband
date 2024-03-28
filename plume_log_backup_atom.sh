@@ -19,26 +19,20 @@
 ################################################################################
 
 #-------------------------------------------------------------------------------
-#This file run as scheduled task and backup selcted logs from /rdklogs/logs
-# to /tmp. The backup logs are made available for plume log pull
+# This file run as scheduled task and backup selcted log files from
+# /rdklogs/logs to /tmp. The backup logs are made available for plume log pull
 #-------------------------------------------------------------------------------
 
-#Maximum size of *.1 log file
+#Maximum size of *.1 log file (in bytes)
 BCKUP_MAXSIZE=800000
 
-RDK_LOGS_PATH=/rdklogs/logs/
-LOG_BACK_UP_PATH=/tmp/Plumelogbackup_ATOM/
+RDK_LOGS_PATH="/rdklogs/logs"
+LOG_BACK_UP_PATH="/tmp/Plumelogbackup_ATOM"
 
-#Do not backup logs if plume is disabled
+#Do not backup logs if Plume or Plume log pull is disabled
 [ "$(cat /tmp/.syscfg_son_admin_status 2>/dev/null)" = "1" ] || exit 0
 [ "$(cat /tmp/.syscfg_son_operational_status 2>/dev/null)" = "1" ] || exit 0
-
-#Check is plume log pull is enabled. Perform backup only if Plume log pull is enabled
-logpull_enable=`rpcclient2 'syscfg get son_logpull_enable' | tail -n 2 | head -n 1`
-if [ -z "$logpull_enable" ] || [ "$logpull_enable" = "0" ] ;
-then
-    exit
-fi
+[ "$(rpcclient2 'syscfg get son_logpull_enable' | tail -n 2 | head -n 1)" = "1" ] || exit 0
 
 if [ -f /etc/device.properties ]
 then
@@ -53,77 +47,87 @@ else
     touch /tmp/timestamp.sh
 fi
 
-Log_files="wifi_vendor.log wifi_vendor_apps.log wifi_vendor_hal.log WiFilog.txt.0 WiFilog.txt.1 wifihealth.txt SelfHeal.txt.0 SelfHeal.txt.0.1 MeshAgentLog.txt.0 MeshAgentLog.txt.1 AtomConsolelog.txt.0 AtomConsolelog.txt.0.1"
+Log_files="
+wifi_vendor.log
+wifi_vendor_apps.log
+wifi_vendor_hal.log
+WiFilog.txt.0
+WiFilog.txt.1
+wifihealth.txt
+SelfHeal.txt.0
+SelfHeal.txt.0.1
+MeshAgentLog.txt.0
+MeshAgentLog.txt.1
+AtomConsolelog.txt.0
+AtomConsolelog.txt.0.1
+"
 
 DoBackup_1()
 {
     #1. Check if file already exists in backup folder
-    if [ -f $LOG_BACK_UP_PATH$1 ]
+    if [ -f $LOG_BACK_UP_PATH/$1 ]
     then
-	#2. Check the size of file. If gretaer than 800 KB, move the file to .2 and copy the file from rdklogs
-	size=`stat -c %s $LOG_BACK_UP_PATH$1`
-	if [ $size -ge $BCKUP_MAXSIZE ]
-	then
-	    mv $LOG_BACK_UP_PATH$1 $LOG_BACK_UP_PATH$1".2"
-	    cp $RDK_LOGS_PATH$1 $LOG_BACK_UP_PATH
-
-	else
-	    #3. Append the rdklogs file contents to backup 
-	    cat $RDK_LOGS_PATH$1 >> $LOG_BACK_UP_PATH$1
+        #2. Check the size of file. If gretaer than 800 KB, move the file to .2 and copy the file from rdklogs
+        size=`stat -c %s $LOG_BACK_UP_PATH/$1`
+        if [ $size -ge $BCKUP_MAXSIZE ]
+        then
+            mv $LOG_BACK_UP_PATH/$1 $LOG_BACK_UP_PATH/$1".2"
+            cp $RDK_LOGS_PATH/$1 $LOG_BACK_UP_PATH/
+        else
+            #3. Append the rdklogs file contents to backup
+            cat $RDK_LOGS_PATH/$1 >> $LOG_BACK_UP_PATH/$1
         fi
-
     else
-	cp $RDK_LOGS_PATH$1 $LOG_BACK_UP_PATH
+        cp $RDK_LOGS_PATH/$1 $LOG_BACK_UP_PATH/
     fi
 }
 
 #Perform log backup of *.1 files
 CreateLogBackup_1()
 {
-    timestamp=`stat -c %Y $RDK_LOGS_PATH$1`
+    timestamp=`stat -c %Y $RDK_LOGS_PATH/$1`
 
     #Check for the previous timestamp of the log file
     case "$1" in
-               "WiFilog.txt.1") 
-		       if [ "$WIFI" != $timestamp ]
-		        then
-		           DoBackup_1 $1
-		           #remove the entry of WIFI timestamp from file and add new timestamp
-			   sed -i '/WIFI/d' /tmp/timestamp.sh
-			   echo "WIFI="$timestamp  >> /tmp/timestamp.sh
-		        fi
-               ;;
+        "WiFilog.txt.1")
+            if [ "$WIFI" != $timestamp ]
+            then
+                DoBackup_1 $1
+                #remove the entry of WIFI timestamp from file and add new timestamp
+                sed -i '/WIFI/d' /tmp/timestamp.sh
+                echo "WIFI=$timestamp" >> /tmp/timestamp.sh
+            fi
+            ;;
 
-	      "MeshAgentLog.txt.1") 
-		       if [ "$MESH" != $timestamp ]
-		        then
-		           DoBackup_1 $1
-		           #remove the entry of MESH timestamp from file and add new timestamp
-			   sed -i '/MESH/d' /tmp/timestamp.sh
-			   echo "MESH="$timestamp  >> /tmp/timestamp.sh
-		        fi
-               ;;
+        "MeshAgentLog.txt.1")
+            if [ "$MESH" != $timestamp ]
+            then
+                DoBackup_1 $1
+                #remove the entry of MESH timestamp from file and add new timestamp
+                sed -i '/MESH/d' /tmp/timestamp.sh
+                echo "MESH=$timestamp" >> /tmp/timestamp.sh
+            fi
+            ;;
 
-              "SelfHeal.txt.0.1") 
-		       if [ "$SELFHEAL" != $timestamp ]
-		        then
-		           DoBackup_1 $1
-		           #remove the entry of SelfHeal timestamp from file and add new timestamp
-			   sed -i '/SELFHEAL/d' /tmp/timestamp.sh
-			   echo "SELFHEAL="$timestamp  >> /tmp/timestamp.sh
-		        fi
-               ;;
+        "SelfHeal.txt.0.1")
+            if [ "$SELFHEAL" != $timestamp ]
+            then
+                DoBackup_1 $1
+                #remove the entry of SelfHeal timestamp from file and add new timestamp
+                sed -i '/SELFHEAL/d' /tmp/timestamp.sh
+                echo "SELFHEAL=$timestamp" >> /tmp/timestamp.sh
+            fi
+            ;;
 
-             "AtomConsolelog.txt.0.1") 
-		       if [ "$ARMCONSOLE" != $timestamp ]
-		        then
-		           DoBackup_1 $1
-		           #remove the entry of ArmConsole timestamp from file and add new timestamp
-			   sed -i '/ATOMCONSOLE/d' /tmp/timestamp.sh
-			   echo "ATOMCONSOLE="$timestamp  >> /tmp/timestamp.sh
-		        fi
-               ;;
-    
+        "AtomConsolelog.txt.0.1")
+            if [ "$ARMCONSOLE" != $timestamp ]
+            then
+                DoBackup_1 $1
+                #remove the entry of ArmConsole timestamp from file and add new timestamp
+                sed -i '/ATOMCONSOLE/d' /tmp/timestamp.sh
+                echo "ATOMCONSOLE=$timestamp" >> /tmp/timestamp.sh
+            fi
+            ;;
     esac
 }
 
@@ -138,17 +142,17 @@ CreateLogBackUp()
 
     case $1 in
         *.1)
-              CreateLogBackup_1 $1
-              ;;
+            CreateLogBackup_1 $1
+            ;;
         *)
-              #copy *log.txt.0 contents to backup.
-              cp $RDK_LOGS_PATH$1 $LOG_BACK_UP_PATH
-              ;;
+            #copy *log.txt.0 contents to backup.
+            cp $RDK_LOGS_PATH/$1 $LOG_BACK_UP_PATH/
+            ;;
     esac
 }
 
 #Backup ATOM logs
-for file in $Log_files ; do
+for file in $Log_files
+do
     CreateLogBackUp $file
 done
-
