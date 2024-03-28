@@ -68,16 +68,16 @@ LOG_FILE=$MAC"_Logs_$dt.tgz"
 
 FLUSH_LOG_PATH="/rdklogger/flush_logs.sh"
 
-SYS_CFG_FILE="syscfg.db"
+SYSCFG_FILE="syscfg.db"
 BBHM_CFG_FILE="bbhm_cur_cfg.xml"
 WIRELESS_CFG_FILE="wireless"
 SE05x_rdk_logs="se05x_daemon.log"
 SE05x_tmp_logs="/tmp/rdkssa.txt"
 
 if [ "$BOX_TYPE" = "XB3" ]; then
-SYS_DB_FILE="/nvram/syscfg.db"
+SYSCFG_DB_FILE="/nvram/syscfg.db"
 else
-SYS_DB_FILE="/opt/secure/data/syscfg.db"
+SYSCFG_DB_FILE="/opt/secure/data/syscfg.db"
 fi
 
 moveFile()
@@ -364,7 +364,7 @@ CopyToTmp()
 	fi
 	rm -rf $LOG_SYNC_BACK_UP_PATH$PcdLogFile
 	if [ "$BOX_TYPE" = "XB6" ]; then
-		rm -rf $LOG_SYNC_BACK_UP_PATH$SYS_CFG_FILE  
+		rm -rf $LOG_SYNC_BACK_UP_PATH$SYSCFG_FILE
 		rm -rf $LOG_SYNC_BACK_UP_PATH$BBHM_CFG_FILE
 		rm -rf $LOG_SYNC_BACK_UP_PATH$WIRELESS_CFG_FILE
 	fi
@@ -592,7 +592,7 @@ backupnvram2logs()
         fi
 
         if [ "$BOX_TYPE" = "XB6" ]; then
-        	cp $SYS_DB_FILE $LOG_SYNC_PATH$SYS_CFG_FILE
+        	cp $SYSCFG_DB_FILE $LOG_SYNC_PATH$SYSCFG_FILE
         	cp /tmp/$BBHM_CFG_FILE $LOG_SYNC_PATH$BBHM_CFG_FILE
         	cp /nvram/config/$WIRELESS_CFG_FILE $LOG_SYNC_PATH$WIRELESS_CFG_FILE
         	sed -i "s/.*passphrase.*/\toption passphrase \'\'/g" $LOG_SYNC_PATH$WIRELESS_CFG_FILE
@@ -624,7 +624,7 @@ backupnvram2logs()
 	fi
 	rm -rf $LOG_SYNC_PATH$PcdLogFile
 	if [ "$BOX_TYPE" = "XB6" ]; then
-		rm -rf $LOG_SYNC_PATH$SYS_CFG_FILE  
+		rm -rf $LOG_SYNC_PATH$SYSCFG_FILE  
 		rm -rf $LOG_SYNC_PATH$BBHM_CFG_FILE
 		rm -rf $LOG_SYNC_PATH$WIRELESS_CFG_FILE
 	fi
@@ -699,7 +699,7 @@ backupnvram2logs_on_reboot()
         fi
 
          if [ "$BOX_TYPE" = "XB6" ]; then
-        	cp $SYS_DB_FILE $TarFolder$SYS_CFG_FILE
+        	cp $SYSCFG_DB_FILE $TarFolder$SYSCFG_FILE
         	cp /nvram/$BBHM_CFG_FILE $TarFolder$BBHM_CFG_FILE
         	cp /nvram/config/$WIRELESS_CFG_FILE $TarFolder$WIRELESS_CFG_FILE
        		sed -i "s/.*passphrase.*/\toption passphrase \'\'/g" $TarFolder$WIRELESS_CFG_FILE
@@ -729,7 +729,7 @@ backupnvram2logs_on_reboot()
 	rm -rf $TarFolder$PcdLogFile
 	rm -rf $TarFolder$RAM_OOPS_FILE
 	if [ "$BOX_TYPE" = "XB6" ]; then
-		rm -rf $TarFolder$SYS_CFG_FILE
+		rm -rf $TarFolder$SYSCFG_FILE
 		rm -rf $TarFolder$BBHM_CFG_FILE
 		rm -rf $TarFolder$WIRELESS_CFG_FILE
 	fi
@@ -833,7 +833,7 @@ backupAllLogs()
               cp $SE05x_tmp_logs $dt$SE05x_rdk_logs
         fi
 	if [ "$BOX_TYPE" = "XB6" ]; then
-		cp $SYS_DB_FILE $dt$SYS_CFG_FILE
+		cp $SYSCFG_DB_FILE $dt$SYSCFG_FILE
         cp /nvram/$BBHM_CFG_FILE $dt$BBHM_CFG_FILE
         cp /nvram/config/$WIRELESS_CFG_FILE $dt$WIRELESS_CFG_FILE
         sed -i "s/.*passphrase.*/\toption passphrase \'\'/g" $dt$WIRELESS_CFG_FILE
