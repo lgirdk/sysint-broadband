@@ -588,7 +588,7 @@ backupnvram2logs()
 
 	cd $destn
 	cp /version.txt $LOG_SYNC_PATH
-        if [ "$MODEL_NUM" = "CGM4981COM" ] || [ "$MODEL_NUM" == "SR213" ]; then
+        if [ "$MODEL_NUM" = "CGM4981COM" ] || [ "${MODEL_NUM}" = "CGM601TCOM" ] || [ "${MODEL_NUM}" = "SG417DBCT" ] || [ "$MODEL_NUM" == "SR213" ]; then
               cp $SE05x_tmp_logs $LOG_SYNC_PATH$SE05x_rdk_logs
         fi
 
@@ -695,7 +695,7 @@ backupnvram2logs_on_reboot()
 
 	cd $destn
 	cp /version.txt $LOG_SYNC_PATH
-        if [ "$MODEL_NUM" = "CGM4981COM" ] || [ "$MODEL_NUM" == "SR213" ]; then
+        if [ "$MODEL_NUM" = "CGM4981COM" ] || [ "${MODEL_NUM}" = "CGM601TCOM" ] || [ "${MODEL_NUM}" = "SG417DBCT" ] || [ "$MODEL_NUM" == "SR213" ]; then
               cp $SE05x_tmp_logs $TarFolder$SE05x_rdk_logs
         fi
 
@@ -830,7 +830,7 @@ backupAllLogs()
 		$operation $source$fname $dt; >$source$fname;
 	done
 	cp /version.txt $dt
-        if [ "$MODEL_NUM" = "CGM4981COM" ] || [ "$MODEL_NUM" == "SR213" ]; then
+        if [ "$MODEL_NUM" = "CGM4981COM" ] || [ "${MODEL_NUM}" = "CGM601TCOM" ] || [ "${MODEL_NUM}" = "SG417DBCT" ] || [ "$MODEL_NUM" == "SR213" ]; then
               cp $SE05x_tmp_logs $dt$SE05x_rdk_logs
         fi
 	if [ "$BOX_TYPE" = "XB6" ]; then
