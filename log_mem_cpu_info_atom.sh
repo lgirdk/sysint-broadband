@@ -168,6 +168,14 @@ TMPFS_THRESHOLD=85
 		if [ $freeMemSys -lt $LOW_MEM_THRESHOLD ]; then
 			echo_t "ERROR free memory is less than threshold value $LOW_MEM_THRESHOLD FREE_MEM_ATOM:$freeMemSys at timesstamp $timestamp" >> "$LOG_FILE"
 			t2CountNotify "SYS_ERROR_LOW_FREE_MEMORY_ATOM"
+			echo_t "df -h:" >> "$LOG_FILE"
+			echo_t "`df -h`" >> "$LOG_FILE"
+			echo_t "ls -lS of tmp folder:" >> "$LOG_FILE"
+			echo_t "`ls -lS /tmp/`" >> "$LOG_FILE"
+			echo_t "ps wwl:" >> "$LOG_FILE"
+			echo_t "`ps wwl`" >> "$LOG_FILE"
+			echo_t "cat /proc/meminfo:" >> "$LOG_FILE"
+			echo_t "`cat /proc/meminfo`" >> "$LOG_FILE"
 		fi
 
 	    LOAD_AVG=`uptime | awk -F'[a-z]:' '{ print $2}' | sed 's/^ *//g' | sed 's/,//g' | sed 's/ /:/g'`
