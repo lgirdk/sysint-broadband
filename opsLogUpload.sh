@@ -395,6 +395,7 @@ fi
 	# Response after executing curl with the public key is 200, then file uploaded successfully.
         if [ "$http_code" = "200" ];then
 	     echo_t "LOGS UPLOADED SUCCESSFULLY, RETURN CODE: $http_code"
+             echo "$UploadFile" > /tmp/upload_file_value.txt
 	     t2CountNotify "SYS_INFO_LOGS_UPLOADED"
 	    #Remove all log directories
              echo_t "[DEBUG] Removing log directory $blog_dir" >>  /rdklogs/logs/telemetry2_0.txt.0
@@ -469,6 +470,7 @@ fi
             #Logs upload successful when the return code is 200 after the second curl execution.
             if [ "$http_code" = "200" ];then
                 echo_t "LOGS UPLOADED SUCCESSFULLY, RETURN CODE: $http_code"
+                echo "$UploadFile" > /tmp/upload_file_value.txt
 	        t2CountNotify "SYS_INFO_LOGS_UPLOADED"
 	        #Remove all log directories
                 echo_t "[DEBUG] Removing log directory $blog_dir" >>  /rdklogs/logs/telemetry2_0.txt.0
