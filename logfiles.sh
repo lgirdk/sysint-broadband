@@ -484,7 +484,8 @@ preserveThisLog()
 			fi #end of if [ $backupCount -lt ..
 			#ARRISXB6-8631, mitigation to reboot when we dont have connectivity for long time
 			if [ "$model" = "TG3482G" ]; then
-                                if [ "$3" != "wan-stopped" ]; then
+                                wan_status="`sysevent get wan-status`"
+                                if [ "$3" != "wan-stopped" ] && [ "$wan_status" != "stopped" ]; then
 				        if [ $backupCount -ge 2 ]; then
 					        checkConnectivityAndReboot
 				        fi #if [ $backupCount -eq ..; 
