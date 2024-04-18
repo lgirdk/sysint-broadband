@@ -103,6 +103,13 @@ exec_curl_mtls () {
                 elif [ "x$http_code" == "x404" ] ; then
                     echo_log "HTTP Response code received is 404"
                     break
+                elif [ "x$TLSRet" == "x0" ] && [ "x$http_code" == "x495" ] ; then
+                    echo_log "curl ret $TLSRet http_code $http_code"
+                    tlsLog "CERTERR, $MOD, $TLSRet, $FQDN, $cert"
+                    if [ -f /lib/rdk/t2Shared_api.sh ]; then
+                        t2ValNotify "certerr_split" "$MOD, $TLSRet, $FQDN, $cert"
+                    fi
+                    continue
                 else
                     case $TLSRet in
                     35|51|53|54|58|59|60|64|66|77|80|82|83|90|91)
