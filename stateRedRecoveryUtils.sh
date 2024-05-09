@@ -78,7 +78,6 @@ unsetStateRed()
            t2ValNotify "certerr_split" "State Red Recovery Exit"
        fi
    fi
-   rm -f /tmp/stateredidx
    stateredRecoveryURL=""
  }
 
@@ -140,21 +139,12 @@ getStateRedXconfUrl()
 getStateRedCreds()
 {
     stateRedCreds=""
-    if [ -f /etc/ssl/certs/statered.pem ]; then
+    if [ -f /etc/ssl/certs/RedRecovery.p12 ]; then
         if [ ! -f /usr/bin/GetConfigFile ]; then
             stateRedlog "Error: State Red GetConfigFile Not Found"
             exit 127
         fi
-        ID="/tmp/stateredidx"
-        if [ ! -f $ID ]; then
-            GetConfigFile $ID
-        fi
-
-        if [ ! -f $ID ]; then
-            stateRedlog "Error: State Red Recovery, cert not found"
-            exit 128
-        fi
-        stateRedCreds="--cert /etc/ssl/certs/statered.pem --key /tmp/stateredidx"
+        stateRedCreds="--cert-type P12 --cert /etc/ssl/certs/RedRecovery.p12 --config /dev/stdin"
     fi
     echo "$stateRedCreds"
 }
