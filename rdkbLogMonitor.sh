@@ -873,6 +873,28 @@ do
 		    fi
 		done
 
+		#Rotate dibbler logs 
+		for file in $DIBBLER_VAR_LOG_FILE_LIST
+		do
+		    getLogfileSize $DIBBLER_VAR_LOG_PATH/${file}
+		    if [ "$totalSize" -ge "$MAX_FILE_SIZE" ]; then
+		       cp -f $DIBBLER_VAR_LOG_PATH/${file} $DIBBLER_VAR_LOG_PATH/${file}.1
+		       >$DIBBLER_VAR_LOG_PATH/${file}
+		    fi
+		done
+
+		for dir in $DIBBLER_CLIENT_LOG_PATH
+		do  
+		    for file in $DIBBLER_CLIENT_LOG_FILE_LIST
+		    do  
+		        getLogfileSize ${dir}/${file}
+		        if [ "$totalSize" -ge "$MAX_FILE_SIZE" ]; then
+		           cp -f ${dir}/${file} ${dir}/${file}.1
+		           >${dir}/${file}
+		        fi
+		    done
+		done
+
 		#In MV1, the log limit to the files in /nvram/log/ is set to 200k which is high and may lead to /nvram full.
 		#So, we are flushing the logs, if the cumulative size of the folder reaches more than 100k.
 		#For other platforms we are setting the MAX size limit to value to 800k.
