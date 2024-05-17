@@ -31,7 +31,17 @@ fi
 
 IPV6_BIN="/usr/sbin/ip6tables -w "
 IPV4_BIN="/usr/sbin/iptables -w "
-PROD_SSH_WHITELIST_FILE="/etc/dropbear/prodMgmtIps.cfg"
+CFG_FILE="/tmp/prodMgmtIps.cfg"
+if [ ! -f /usr/bin/GetConfigFile ];then
+   echo "Error: GetConfigFile Not Found"
+   exit 127
+fi
+GetConfigFile $CFG_FILE
+if [ ! -f $CFG_FILE ];then
+   echo "Error : Extraction failure for file"
+   exit 127
+fi
+PROD_SSH_WHITELIST_FILE="/tmp/prodMgmtIps.cfg"
 
 rfclog ()
 {
