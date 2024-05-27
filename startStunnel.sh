@@ -110,17 +110,24 @@ rm -f $D_FILE
 
 REVSSHPID1=`cat $REVSSH_PID_FILE`
 STUNNELPID=`cat $STUNNEL_PID_FILE`
-
-if [ -z "$STUNNELPID" ]; then
-    rm -f $STUNNEL_PID_FILE
-    rm -f $CA_FILE
-    if [ "x$CRED_INDEX" == "x0" ]; then
-        touch /tmp/.$SE_DEVICE_CERT
+count=0
+while [ -z "$STUNNELPID" ]; do
+    if [ $count -lt 2 ]; then
+	sleep 1
+        echo_t "STUNNEL: stunnel PID file is not available, Retrying..." >> $LOG_FILE
+        STUNNELPID=`cat $STUNNEL_PID_FILE`
+        count=$((count + 1))
+    else
+        rm -f $STUNNEL_PID_FILE
+    	rm -f $CA_FILE
+    	if [ "x$CRED_INDEX" == "x0" ]; then
+        	touch /tmp/.$SE_DEVICE_CERT
+    	fi
+    	echo_t "STUNNEL: stunnel-client failed to establish. Exiting..." >> $LOG_FILE
+        t2CountNotify "SHORTS_STUNNEL_CLIENT_FAILURE"
+        exit
     fi
-    echo_t "STUNNEL: stunnel-client failed to establish. Exiting..." >> $LOG_FILE
-    t2CountNotify "SHORTS_STUNNEL_CLIENT_FAILURE"
-    exit
-fi
+done
 
 #Starting startTunnel
 /bin/sh /lib/rdk/startTunnel.sh start ${REVERSESSHARGS}${SHORTSHOSTLOGIN}
