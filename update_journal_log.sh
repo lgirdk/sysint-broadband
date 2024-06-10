@@ -39,7 +39,7 @@ do
    
    #Keeps appending to the existing file 
    nice -n 19 journalctl -k --since "${difference_time} sec ago" >> ${DMESG_FILE}
-   if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "XF3" ] || [ "$BOX_TYPE" = "TCCBR" ] || [ "$BOX_TYPE" == "VNTXER5" ];then
+   if [ "$BOX_TYPE" = "XB6" ] || [ "$BOX_TYPE" = "XF3" ] || [ "$BOX_TYPE" = "TCCBR" ] || [ "$BOX_TYPE" == "VNTXER5" ] || [ "$BOX_TYPE" == "SCER11BEL" ];then
 	   #ARRISXB6-7973: Complete journalctl logs to /rdklogs/logs/journal_logs.txt.0
            uptime_in_secs=$(cut -d. -f1 /proc/uptime)
            if [ $uptime_in_secs -ge 240 ]  && [ $BootupLog_is_updated -eq 0 ]; then
