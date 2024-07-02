@@ -42,7 +42,9 @@ getMtlsCreds()
        fi
     fi
 
-    if [ -f /nvram/certs/devicecert_1.pk12 ] && [ -f /usr/bin/rdkssacli ]; then
+    if [ -f /nvram/certs/devicecert_2.pk12 ] && [ "$UseSEBasedCert" = "true" ] && [ -f /usr/bin/rdkssacli ]; then
+        mtlscreds=" --cert-type P12 --cert /nvram/certs/devicecert_2.pk12:$(/usr/bin/rdkssacli "{STOR=GET,SRC=kjvrverlzhlo,DST=/dev/stdout}")"
+    elif [ -f /nvram/certs/devicecert_1.pk12 ] && [ -f /usr/bin/rdkssacli ]; then
         mtlscreds=" --cert-type P12 --cert /nvram/certs/devicecert_1.pk12:$(/usr/bin/rdkssacli "{STOR=GET,SRC=kquhqtoczcbx,DST=/dev/stdout}")"
     elif [ -f $ltcert ]  && [ "$LONG_TERM_CERT" == "true" ]; then
         if [ ! -f /usr/bin/GetConfigFile ]; then
