@@ -25,7 +25,7 @@ source /lib/rdk/t2Shared_api.sh
 
 LOG_PATH=/rdklogs/logs
 
-MAXSIZE_ATOM=5000
+MAXSIZE_ATOM=14000
 MAX_FILE_SIZE_ATOM=300
 
 TFTP_PORT=69
