@@ -26,7 +26,7 @@ source /lib/rdk/t2Shared_api.sh
 source /lib/rdk/getpartnerid.sh
 
 RDK_LOGGER_PATH="/rdklogger"
-
+RRD_LOG_DIR="/tmp/rrd/"
 source $RDK_LOGGER_PATH/logUpload_default_params.sh
 
 NVRAM2_SUPPORTED="no"
@@ -814,7 +814,7 @@ HttpLogUpload()
     done
 
     #Venu ARRISXB6-8244 
-    if [ "$UploadPath" != "$PRESERVE_LOG_PATH" ] ; then
+    if [ "$UploadPath" != "$PRESERVE_LOG_PATH" ]  && [ "$UploadPath" != "$RRD_LOG_DIR"] ; then
       if [ "$UploadPath" != "" ] && [ -d $UploadPath ]; then
         rm -rf $UploadPath
       fi
