@@ -905,7 +905,7 @@ do
 		fi
 
 		# Set the file size limit to file SelfHealBootUpLogFile of nvram2 folder.
-		if [ $backupenable = "true" ] && [ -f $LOG_SYNC_PATH/$SelfHealBootUpLogFile ]; then
+		if [ "$backupenable" = "true" ] && [ -f $LOG_SYNC_PATH/$SelfHealBootUpLogFile ]; then
 		    getLogfileSize $LOG_SYNC_PATH/${SelfHealBootUpLogFile}
 		    if [ "$totalSize" -ge "$MAX_FILE_SIZE" ]; then
 			# Copy file_name -> file_name.1 and truncate the original file.
